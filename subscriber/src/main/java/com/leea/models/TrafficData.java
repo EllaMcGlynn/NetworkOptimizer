@@ -32,14 +32,6 @@ public class TrafficData {
 
 	private LocalDateTime timeStamp;
 	
-	public TrafficData(int nodeID, int networkID, Map<String, Double> resourceUsage, Map<String, Double> resourceAllocated, LocalDateTime timeStamp) {
-		this.nodeID = nodeID;
-		this.networkID = networkID;
-		this.resourceUsage = resourceUsage;
-		this.resourceAllocated = resourceAllocated;
-		this.timeStamp = timeStamp;
-	}
-	
 	public TrafficData() {
 		
 	}
