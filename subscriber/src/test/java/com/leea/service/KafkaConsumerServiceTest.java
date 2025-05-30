@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.any;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,6 +40,15 @@ class KafkaConsumerServiceTest {
         """;
         kafkaConsumerService.listen(jsonMessage);
 
-        verify(repository, times(1)).save(any(TrafficData.class));
+        ArgumentCaptor<TrafficData> captor = ArgumentCaptor.forClass(TrafficData.class);
+        verify(repository, times(1)).save(captor.capture());
+        
+        TrafficData saved = captor.getValue();
+        assertEquals(1, saved.getNodeID());
+        assertEquals(1, saved.getNetworkID());
+        assertEquals(50.0, saved.getResourceUsage().get("cpu"));
+        assertEquals(50.5, saved.getResourceUsage().get("memory"));
+        assertEquals(70.0, saved.getResourceAllocated().get("cpu"));
+        assertEquals(30.5, saved.getResourceAllocated().get("memory"));
     }
 }
