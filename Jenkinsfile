@@ -29,5 +29,11 @@ pipeline {
                 echo "SonarQube Analysis"
             }
         }
+
+        stage("Deploy") {
+            steps {
+                sh "docker-compose up --build"
+            }
+        }
     }
 }

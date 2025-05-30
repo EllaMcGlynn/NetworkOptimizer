@@ -1,0 +1,33 @@
+version: '3'
+services:
+  client:
+    build: ./client
+    ports:
+      - "8081:8080"
+    networks:
+      - aura-network
+
+  generator:
+    build: ./generator
+    ports:
+      - "8082:8080"
+    networks:
+      - aura-network
+
+  optimizer:
+    build: ./optimizer
+    ports:
+      - "8083:8080"
+    networks:
+      - aura-network
+
+  subscriber:
+    build: ./subscriber
+    ports:
+      - "8084:8080"
+    networks:
+      - aura-network
+
+networks:
+  aura-network:
+    driver: bridge
