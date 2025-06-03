@@ -26,7 +26,7 @@ pipeline {
 
         stage("Code Quality Analysis") {
             steps {
-                echo "SonarQube Analysis"
+                echo "SonarQube Analysis (test comment)" 
             }
         }
 
