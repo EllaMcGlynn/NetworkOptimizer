@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.leea.logger.MessageLogger;
 import com.leea.models.TrafficData;
 import com.leea.repo.DataRepo;
 
@@ -23,5 +24,6 @@ public class KafkaConsumerService {
 	    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 	    TrafficData data = mapper.readValue(message, TrafficData.class);
 	    repository.save(data);
+	    MessageLogger.log(data);
 	}
 }
