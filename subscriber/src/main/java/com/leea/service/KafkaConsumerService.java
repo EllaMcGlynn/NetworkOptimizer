@@ -21,7 +21,6 @@ public class KafkaConsumerService {
 	public void listen(String message) throws JsonProcessingException {
 	    ObjectMapper mapper = new ObjectMapper();
 	    mapper.registerModule(new JavaTimeModule());
-	    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 	    TrafficData data = mapper.readValue(message, TrafficData.class);
 	    repository.save(data);
 	    MessageLogger.log(data);

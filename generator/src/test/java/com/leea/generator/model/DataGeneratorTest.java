@@ -3,6 +3,7 @@ package com.leea.generator.model;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,7 +15,7 @@ class DataGeneratorTest {
         DataGenerator data = new DataGenerator();
         data.nodeId = 1;
         data.networkId = 101;
-        data.timestamp = Instant.now();
+        data.timestamp = LocalDateTime.now();
         data.resourceAllocated = Map.of("cpu", 80.0);
         data.resourceUsage = Map.of("cpu", 42.0);
 
