@@ -17,7 +17,7 @@ import lombok.Data;
 public class TrafficData {
 	@Id
 	private long id;
-	private int nodeID, networkID;
+	private int nodeId, networkId;
 	@ElementCollection
 	@CollectionTable(name = "traffic_resource_usage", joinColumns = @JoinColumn(name = "traffic_data_id"))
 	@MapKeyColumn(name = "resource_type")
