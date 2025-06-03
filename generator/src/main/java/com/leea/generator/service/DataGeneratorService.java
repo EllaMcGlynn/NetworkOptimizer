@@ -2,6 +2,7 @@ package com.leea.generator.service;
 
 import com.leea.generator.model.DataGenerator;
 import com.leea.generator.kafka.DataGeneratorProducer;
+import com.leea.generator.logging.NodeLogger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +51,7 @@ public class DataGeneratorService {
             data.resourceUsage = usage;
             data.timestamp = Instant.now();
 
-
+            NodeLogger.log(data);
 
             dataGeneratorProducer.send(data);
         }
