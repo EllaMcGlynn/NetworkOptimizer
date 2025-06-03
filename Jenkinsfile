@@ -10,8 +10,7 @@ pipeline {
         TAG = ""
     }
 
-    stages{
-
+    stages {
         stage("Build") {
             steps {
                 sh "mvn install -DskipTests"
@@ -26,12 +25,11 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-            withSonarQubeEnv("SonarQube") {
-                script {
-              sh "mvn clean verify sonar:sonar -Dsonar.projectKey=AURA -Dsonar.projectName='AURA'"
+                withSonarQubeEnv("SonarQube") {
+                    sh "mvn clean verify sonar:sonar -Dsonar.projectKey=${APP_NAME} -Dsonar.projectName='${APP_NAME}'"
+                }
             }
         }
-      }
 
         stage("Deploy") {
             steps {
