@@ -24,11 +24,11 @@ pipeline {
             }
         }
 
-        stage("Code Quality Analysis") {
-            steps {
-                echo "SonarQube Analysis (test comment)" 
+        stage('SonarQube Analysis') {
+            withSonarQubeEnv("SonarQube") {
+              sh "mvn clean verify sonar:sonar -Dsonar.projectKey=AURA -Dsonar.projectName='AURA'"
             }
-        }
+      }
 
         stage("Deploy") {
             steps {
