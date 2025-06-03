@@ -2,9 +2,8 @@ package com.leea.optimizer.service;
 
 import com.leea.optimizer.models.OptimizationRecommendation;
 import com.leea.optimizer.models.TrafficData;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,21 +12,15 @@ import java.util.List;
 @Service
 public class OptimizationService {
 
-    private final RestTemplate restTemplate = new RestTemplate();
-
-    @Value("${subscriber.api.url}")
-    private String subscriberApiUrl; // NEED TO ADD ON SUBSCRIBER SIDE APP PROPRIETIES!!
+    @Autowired
+    private KafkaTrafficDataConsumer kafkaConsumer;
 
     public List<OptimizationRecommendation> optimize() {
-        TrafficData[] recentData = restTemplate.getForObject(subscriberApiUrl, TrafficData[].class);
-
+        List<TrafficData> recentData = kafkaConsumer.getRecentData();
         List<OptimizationRecommendation> recommendations = new ArrayList<>();
-        if (recentData == null) return recommendations;
-
         for (TrafficData data : recentData) {
             recommendations.addAll(evaluateNode(data));
         }
-
         return recommendations;
     }
 
@@ -80,6 +73,11 @@ public class OptimizationService {
         rec.setTimestamp(LocalDateTime.now());
 
         return rec;
+    }
+
+    //helper method for isolated testing
+    public List<OptimizationRecommendation> optimizeSingleNode(TrafficData data) {
+        return evaluateNode(data);
     }
 }
 
