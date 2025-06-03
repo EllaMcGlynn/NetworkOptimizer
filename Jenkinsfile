@@ -27,8 +27,10 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
             withSonarQubeEnv("SonarQube") {
+                script {
               sh "mvn clean verify sonar:sonar -Dsonar.projectKey=AURA -Dsonar.projectName='AURA'"
             }
+        }
       }
 
         stage("Deploy") {
