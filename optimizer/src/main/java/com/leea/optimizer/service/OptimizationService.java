@@ -1,7 +1,7 @@
 package com.leea.optimizer.service;
 
-import com.leea.optimizer.models.OptimizationRecommendation;
-import com.leea.optimizer.models.TrafficData;
+import com.leea.optimizer.kafka.ActionKafkaProducer;
+import com.leea.optimizer.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +15,27 @@ public class OptimizationService {
     @Autowired
     private KafkaTrafficDataConsumer kafkaConsumer;
 
+    @Autowired
+    private OptimizerModeService modeService;
+
+    @Autowired
+    private ActionKafkaProducer actionProducer;
+
     public List<OptimizationRecommendation> optimize() {
         List<TrafficData> recentData = kafkaConsumer.getRecentData();
         List<OptimizationRecommendation> recommendations = new ArrayList<>();
+
         for (TrafficData data : recentData) {
-            recommendations.addAll(evaluateNode(data));
+            for (OptimizationRecommendation rec : evaluateNode(data)) {
+                recommendations.add(rec);
+                if (modeService.getCurrentMode() == OptimizerMode.AUTO) {
+                    NodeStatus status = getNodeStatus(rec);
+                    if (status == NodeStatus.HIGH || status == NodeStatus.LOW) {
+                        OptimizerAction action = createActionFromRecommendation(rec, status);
+                        actionProducer.sendAction(action);
+                    }
+                }
+            }
         }
         return recommendations;
     }
@@ -75,9 +91,33 @@ public class OptimizationService {
         return rec;
     }
 
-    //helper method for isolated testing
-    public List<OptimizationRecommendation> optimizeSingleNode(TrafficData data) {
-        return evaluateNode(data);
+    private NodeStatus getNodeStatus(OptimizationRecommendation rec) {
+        double ratio = rec.getCurrentUsage() / rec.getCurrentAllocation();
+        switch (rec.getResourceType()) {
+            case "CPU":
+                return ratio > 0.85 ? NodeStatus.HIGH : ratio < 0.40 ? NodeStatus.LOW : NodeStatus.GOOD;
+            case "Memory":
+                return ratio > 0.90 ? NodeStatus.HIGH : ratio < 0.50 ? NodeStatus.LOW : NodeStatus.GOOD;
+            case "Bandwidth":
+                return ratio > 0.80 ? NodeStatus.HIGH : ratio < 0.30 ? NodeStatus.LOW : NodeStatus.GOOD;
+            default:
+                return NodeStatus.GOOD;
+        }
     }
-}
 
+    private OptimizerAction createActionFromRecommendation(OptimizationRecommendation rec, NodeStatus status) {
+        double change = Math.abs(rec.getRecommendedAllocation() - rec.getCurrentAllocation());
+        String actionType = status == NodeStatus.HIGH ? "INCREASE" : "DECREASE";
+
+        OptimizerAction action = new OptimizerAction();
+        action.setNodeId(rec.getNodeId());
+        action.setResourceType(rec.getResourceType());
+        action.setAmount(change);
+        action.setActionType(actionType);
+        action.setExecutedBy("OPTIMIZER");
+        action.setTimestamp(LocalDateTime.now());
+
+        return action;
+    }
+
+}
