@@ -21,13 +21,13 @@ public class MessageLogger {
     }
 
     public static void log(TrafficData data) {
-        String filename = LOG_DIR + "message-" + data.getNodeID() + ".log";
+        String filename = LOG_DIR + "message-" + data.getNodeId() + ".log";
 
         String logEntry = String.format(
                 "[%s] NodeID: %d | NetworkID: %d | Usage: %s | Allocation: %s%n",
                 data.getTimeStamp().toString(),
-                data.getNodeID(),
-                data.getNetworkID(),
+                data.getNodeId(),
+                data.getNetworkId(),
                 data.getResourceUsage().toString(),
                 data.getResourceAllocated().toString()
         );
@@ -35,7 +35,7 @@ public class MessageLogger {
         try (FileWriter writer = new FileWriter(filename, true)) {
             writer.write(logEntry);
         } catch (IOException e) {
-            System.err.println("Failed to write log for node " + data.getNodeID());
+            System.err.println("Failed to write log for node " + data.getNodeId());
             e.printStackTrace();
         }
     }

@@ -31,8 +31,8 @@ class KafkaConsumerServiceTest {
     public void testKafkaMessageProcessing() throws JsonProcessingException {
     	String jsonMessage = """
             {
-                "nodeID": 1,
-                "networkID": 1,
+                "nodeId": 1,
+                "networkId": 1,
                 "resourceUsage": { "cpu": 50.0, "memory": 50.5 },
                 "resourceAllocated": { "cpu": 70.0, "memory": 30.5 },
                 "timeStamp": "2025-05-30T14:30:00"
@@ -44,8 +44,8 @@ class KafkaConsumerServiceTest {
         verify(repository, times(1)).save(captor.capture());
         
         TrafficData saved = captor.getValue();
-        assertEquals(1, saved.getNodeID());
-        assertEquals(1, saved.getNetworkID());
+        assertEquals(1, saved.getNodeId());
+        assertEquals(1, saved.getNetworkId());
         assertEquals(50.0, saved.getResourceUsage().get("cpu"));
         assertEquals(50.5, saved.getResourceUsage().get("memory"));
         assertEquals(70.0, saved.getResourceAllocated().get("cpu"));
