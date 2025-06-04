@@ -1,6 +1,7 @@
 package com.leea.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JsonParseException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +20,21 @@ public class KafkaConsumerService {
 
 	@KafkaListener(topics = "resource-usage-data", groupId = "consumer-group")
 	public void listen(String message) throws JsonProcessingException {
-	    ObjectMapper mapper = new ObjectMapper();
-	    mapper.registerModule(new JavaTimeModule());
-	    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-	    TrafficData data = mapper.readValue(message, TrafficData.class);
-	    repository.save(data);
-	    MessageLogger.log(data);
+		try {
+		    ObjectMapper mapper = new ObjectMapper();
+		    mapper.registerModule(new JavaTimeModule());
+		    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+		    TrafficData data = mapper.readValue(message, TrafficData.class);
+		    
+		    if (data.getResourceAllocated() == null || data.getResourceUsage() == null || data.getTimeStamp() == null) {
+		    	MessageLogger.logError("null value found entry " + data.getId() + " skipped");
+		    }else {
+		    	repository.save(data);
+			    MessageLogger.log(data);
+		    }
+		} catch (JsonParseException  e) {
+			e.printStackTrace();
+		}
+	    
 	}
 }
