@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -49,7 +49,7 @@ public class DataGeneratorService {
             data.networkId = 100 + nodeId;
             data.resourceAllocated = allocated;
             data.resourceUsage = usage;
-            data.timestamp = Instant.now();
+            data.timestamp = LocalDateTime.now();
 
             NodeLogger.log(data);
 

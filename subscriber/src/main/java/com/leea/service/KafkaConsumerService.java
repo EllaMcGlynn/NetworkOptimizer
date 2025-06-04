@@ -23,7 +23,6 @@ public class KafkaConsumerService {
 		try {
 		    ObjectMapper mapper = new ObjectMapper();
 		    mapper.registerModule(new JavaTimeModule());
-		    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 		    TrafficData data = mapper.readValue(message, TrafficData.class);
 		    
 		    if (data.getResourceAllocated() == null || data.getResourceUsage() == null || data.getTimeStamp() == null) {
@@ -35,6 +34,5 @@ public class KafkaConsumerService {
 		} catch (JsonParseException  e) {
 			e.printStackTrace();
 		}
-	    
 	}
 }

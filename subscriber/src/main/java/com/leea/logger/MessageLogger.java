@@ -25,7 +25,7 @@ public class MessageLogger {
 
         String logEntry = String.format(
                 "[%s] NodeID: %d | NetworkID: %d | Usage: %s | Allocation: %s%n",
-                data.getTimeStamp().toString(),
+                data.getTimestamp().toString(),
                 data.getNodeId(),
                 data.getNetworkId(),
                 data.getResourceUsage().toString(),
