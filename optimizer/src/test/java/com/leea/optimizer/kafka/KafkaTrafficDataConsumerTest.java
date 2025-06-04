@@ -39,4 +39,39 @@ class KafkaTrafficDataConsumerTest {
         assertEquals(1, kafkaConsumerService.getRecentData().size());
     }
     
+    @Test
+    public void testErrorHandling() throws JsonProcessingException{
+    	int startValue = kafkaConsumerService.getRecentData().size();
+    	String jsonMessage1 = """
+                {
+                    "nodeId": 1,
+                    "networkId": 1,
+                    "resourceUsage": null,
+                    "resourceAllocated": { "cpu": 70.0, "memory": 30.5 , "bandwidth": 100.5},
+                    "timestamp": 1748615400.0
+                }
+            """;
+        try {
+			kafkaConsumerService.listen(jsonMessage1);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+            
+        String jsonMessage2 = """
+                {
+                    "nodeId": 1,
+                    "networkId": 1,
+                    "resourceUsage": { "cpu": 50.0, "memory": 50.5 , "bandwidth": 80.5 },
+                    "resourceAllocated": null,
+                    "timestamp": 1748615400.0
+                }
+            """;
+        try {
+			kafkaConsumerService.listen(jsonMessage2);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        
+        assertEquals(startValue, kafkaConsumerService.getRecentData().size());
+    }
 }
