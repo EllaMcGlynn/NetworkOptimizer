@@ -28,6 +28,7 @@ pipeline {
                 withSonarQubeEnv("SonarQube") {
                     sh "mvn clean verify sonar:sonar -Dsonar.projectKey=${APP_NAME} -Dsonar.projectName='${APP_NAME}'"
                 }
+                timeout(time: 1, unit: 'HOURS') {    waitForQualityGate abortPipeline: true}
             }
         }
 
