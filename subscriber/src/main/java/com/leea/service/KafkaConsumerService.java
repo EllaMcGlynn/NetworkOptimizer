@@ -25,7 +25,7 @@ public class KafkaConsumerService {
 		    mapper.registerModule(new JavaTimeModule());
 		    TrafficData data = mapper.readValue(message, TrafficData.class);
 		    
-		    if (data.getResourceAllocated() == null || data.getResourceUsage() == null || data.getTimeStamp() == null) {
+		    if (data.getResourceAllocated() == null || data.getResourceUsage() == null || data.getTimestamp() == null) {
 		    	MessageLogger.logError("null value found entry " + data.getId() + " skipped");
 		    }else {
 		    	repository.save(data);
