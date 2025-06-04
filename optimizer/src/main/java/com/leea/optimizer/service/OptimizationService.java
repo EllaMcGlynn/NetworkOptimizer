@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class OptimizationService {
@@ -55,9 +56,11 @@ public class OptimizationService {
 
     private List<OptimizationRecommendation> evaluateNode(TrafficData data) {
         List<OptimizationRecommendation> recs = new ArrayList<>();
-        recs.add(makeRecommendation(data, "CPU", data.getCpuUsage(), data.getCpuAllocated()));
-        recs.add(makeRecommendation(data, "Memory", data.getMemoryUsage(), data.getMemoryAllocated()));
-        recs.add(makeRecommendation(data, "Bandwidth", data.getBandwidthUsage(), data.getBandwidthAllocated()));
+        Map<String, Double> usage = data.getResourceUsage();
+        Map<String, Double> allocated = data.getResourceAllocated();
+        recs.add(makeRecommendation(data, "CPU", usage.get("cpu"), allocated.get("cpu")));
+        recs.add(makeRecommendation(data, "Memory", usage.get("memory"), allocated.get("memory")));
+        recs.add(makeRecommendation(data, "Bandwidth", usage.get("bandwidth"), allocated.get("bandwidth")));
         return recs;
     }
 
