@@ -1,0 +1,21 @@
+# Kafka Configuration
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: consumer-group
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+# MySQL Configuration
+  datasource:
+    url: jdbc:mysql://localhost:3306/traffic_base
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update 
+    show-sql: true
