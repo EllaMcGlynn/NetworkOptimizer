@@ -50,24 +50,48 @@ public class TrafficData {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public Integer getNodeId() {
         return nodeId;
+    }
+
+    public void setNodeId(Integer nodeId) {
+        this.nodeId = nodeId;
     }
 
     public Integer getNetworkId() {
         return networkId;
     }
 
+    public void setNetworkId(Integer networkId) {
+        this.networkId = networkId;
+    }
+
     public Map<String, Double> getResourceUsage() {
         return resourceUsage;
+    }
+
+    public void setResourceUsage(Map<String, Double> resourceUsage) {
+        this.resourceUsage = resourceUsage;
     }
 
     public Map<String, Double> getResourceAllocated() {
         return resourceAllocated;
     }
 
+    public void setResourceAllocated(Map<String, Double> resourceAllocated) {
+        this.resourceAllocated = resourceAllocated;
+    }
+
     public LocalDateTime getTimestamp() {
         return timestamp;
+    }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
     }
 
     //Methods for resource types (could be helpful later if we do something extra to show-off)
