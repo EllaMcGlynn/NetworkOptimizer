@@ -27,4 +27,28 @@ public class OptimizerAction {
 
     public void setTimestamp(LocalDateTime now) {
     }
+
+    public Integer getNodeId() {
+        return nodeId;
+    }
+
+    public String getResourceType() {
+        return resourceType;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public String getActionType() {
+        return actionType;
+    }
+
+    public String getExecutedBy() {
+        return executedBy;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
 }

@@ -2,6 +2,10 @@ package com.leea.optimizer.service;
 
 import com.leea.optimizer.kafka.ActionKafkaProducer;
 import com.leea.optimizer.models.*;
+import com.leea.optimizer.entity.OptimizerActionEntity;
+import com.leea.optimizer.entity.OptimizationRecommendationEntity;
+import com.leea.optimizer.repository.ActionRepository;
+import com.leea.optimizer.repository.RecommendationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +25,12 @@ public class OptimizationService {
     @Autowired
     private ActionKafkaProducer actionProducer;
 
+    @Autowired
+    private RecommendationRepository recommendationRepository;
+
+    @Autowired
+    private ActionRepository actionRepository;
+
     public List<OptimizationRecommendation> optimize() {
         List<TrafficData> recentData = kafkaConsumer.getRecentData();
         List<OptimizationRecommendation> recommendations = new ArrayList<>();
@@ -28,11 +38,14 @@ public class OptimizationService {
         for (TrafficData data : recentData) {
             for (OptimizationRecommendation rec : evaluateNode(data)) {
                 recommendations.add(rec);
+                saveRecommendationToDB(rec);
+
                 if (modeService.getCurrentMode() == OptimizerMode.AUTO) {
                     NodeStatus status = getNodeStatus(rec);
                     if (status == NodeStatus.HIGH || status == NodeStatus.LOW) {
                         OptimizerAction action = createActionFromRecommendation(rec, status);
                         actionProducer.sendAction(action);
+                        saveActionToDB(action);
                     }
                 }
             }
@@ -53,7 +66,7 @@ public class OptimizationService {
         double recommended = allocated;
         double increaseThreshold;
         double decreaseThreshold;
-        double adjustmentFactor = 0.15; // 15% adjustment
+        double adjustmentFactor = 0.15;
 
         switch (type) {
             case "CPU":
@@ -120,4 +133,31 @@ public class OptimizationService {
         return action;
     }
 
+    private void saveRecommendationToDB(OptimizationRecommendation rec) {
+        OptimizationRecommendationEntity entity = new OptimizationRecommendationEntity();
+        entity.setNodeId(rec.getNodeId());
+        entity.setNetworkId(rec.getNetworkId());
+        entity.setResourceType(rec.getResourceType());
+        entity.setCurrentUsage(rec.getCurrentUsage());
+        entity.setCurrentAllocation(rec.getCurrentAllocation());
+        entity.setRecommendedAllocation(rec.getRecommendedAllocation());
+        entity.setTimestamp(rec.getTimestamp());
+        recommendationRepository.save(entity);
+    }
+
+    private void saveActionToDB(OptimizerAction action) {
+        OptimizerActionEntity entity = new OptimizerActionEntity();
+        entity.setNodeId(action.getNodeId());
+        entity.setResourceType(action.getResourceType());
+        entity.setAmount(action.getAmount());
+        entity.setActionType(action.getActionType());
+        entity.setExecutedBy(action.getExecutedBy());
+        entity.setTimestamp(action.getTimestamp());
+        actionRepository.save(entity);
+    }
+
+    // Optional helper for unit testing
+    public List<OptimizationRecommendation> optimizeSingleNode(TrafficData data) {
+        return evaluateNode(data);
+    }
 }
