@@ -22,6 +22,7 @@ public class KafkaTrafficDataConsumer {
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         TrafficData data = mapper.readValue(message, TrafficData.class);
         recentData.add(data);
+        System.out.print("Recieved data");
     }
 
     public List<TrafficData> getRecentData() {

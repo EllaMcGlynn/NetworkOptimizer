@@ -11,6 +11,9 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
+  main:
+    web-application-type: none
+
   # MySQL Configuration for persisting Optimizer actions
   datasource:
     url: jdbc:mysql://localhost:3306/traffic_base
