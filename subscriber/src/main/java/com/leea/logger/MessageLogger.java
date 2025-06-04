@@ -39,4 +39,15 @@ public class MessageLogger {
             e.printStackTrace();
         }
     }
+    
+    public static void logError(String logEntry) {
+    	String filename = LOG_DIR + "message-errors.log";
+    	
+    	try (FileWriter writer = new FileWriter(filename, true)) {
+            writer.write(logEntry);
+        } catch (IOException e) {
+            System.err.println("Failed to write log for error " + logEntry);
+            e.printStackTrace();
+        }
+    }
 }

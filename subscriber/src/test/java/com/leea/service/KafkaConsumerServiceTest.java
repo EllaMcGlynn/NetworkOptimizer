@@ -51,4 +51,43 @@ class KafkaConsumerServiceTest {
         assertEquals(70.0, saved.getResourceAllocated().get("cpu"));
         assertEquals(30.5, saved.getResourceAllocated().get("memory"));
     }
+    
+    @Test
+    public void testErrorHandling() throws JsonProcessingException{
+    	String jsonMessage1 = """
+                {
+                    "nodeId": 1,
+                    "networkId": 1,
+                    "resourceUsage": null,
+                    "resourceAllocated": { "cpu": 70.0, "memory": 30.5 },
+                    "timeStamp": "2025-05-30T14:30:00"
+                }
+            """;
+        kafkaConsumerService.listen(jsonMessage1);
+            
+        String jsonMessage2 = """
+                {
+                    "nodeId": 1,
+                    "networkId": 1,
+                    "resourceUsage": { "cpu": 50.0, "memory": 50.5 },
+                    "resourceAllocated": null,
+                    "timeStamp": "2025-05-30T14:30:00"
+                }
+            """;
+        kafkaConsumerService.listen(jsonMessage2);
+            
+        String jsonMessage3 = """
+                {
+                    "nodeId": 1,
+                    "networkId": 1,
+                    "resourceUsage": { "cpu": 50.0, "memory": 50.5 },
+                    "resourceAllocated": { "cpu": 70.0, "memory": 30.5 },
+                    "timeStamp": null
+                }
+            """;
+        kafkaConsumerService.listen(jsonMessage3);
+        
+        verify(repository, times(0)).save(any());
+    }
+    
 }
