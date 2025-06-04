@@ -11,30 +11,51 @@ public class OptimizerActionEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "node_id")
     private Integer nodeId;
+
+    @Column(name = "resource_type")
     private String resourceType;
+
+    @Column(name = "amount")
     private double amount;
-    private String actionType; // INCREASE, DECREASE
-    private String executedBy; // USER or OPTIMIZER
+
+    @Column(name = "action_type")
+    private String actionType;
+
+    @Column(name = "executed_by")
+    private String executedBy;
+
+    @Column(name = "timestamp")
     private LocalDateTime timestamp;
 
-    public void setNodeId(Object nodeId) {
-    }
+    // --- Getters and Setters ---
 
-    public void setResourceType(Object resourceType) {
-        
-    }
+    public Long getId() { return id; }
 
-    public void setAmount(Object amount) {
-    }
+    public void setId(Long id) { this.id = id; }
 
-    public void setActionType(Object actionType) {
-    }
+    public Integer getNodeId() { return nodeId; }
 
-    public void setExecutedBy(Object executedBy) {
-    }
+    public void setNodeId(Integer nodeId) { this.nodeId = nodeId; }
 
-    public void setTimestamp(Object timestamp) {
+    public String getResourceType() { return resourceType; }
 
-    }
+    public void setResourceType(String resourceType) { this.resourceType = resourceType; }
+
+    public double getAmount() { return amount; }
+
+    public void setAmount(double amount) { this.amount = amount; }
+
+    public String getActionType() { return actionType; }
+
+    public void setActionType(String actionType) { this.actionType = actionType; }
+
+    public String getExecutedBy() { return executedBy; }
+
+    public void setExecutedBy(String executedBy) { this.executedBy = executedBy; }
+
+    public LocalDateTime getTimestamp() { return timestamp; }
+
+    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
 }

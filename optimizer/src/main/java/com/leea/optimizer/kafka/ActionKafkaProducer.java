@@ -8,10 +8,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class ActionKafkaProducer {
 
-    @Autowired
-    private KafkaTemplate<String, OptimizerAction> kafkaTemplate;
+    private final KafkaTemplate<String, OptimizerAction> kafkaTemplate;
+
+    public ActionKafkaProducer(KafkaTemplate<String, OptimizerAction> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
+    }
 
     public void sendAction(OptimizerAction action) {
         kafkaTemplate.send("optimizer-actions", action);
     }
 }
+

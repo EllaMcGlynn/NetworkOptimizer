@@ -156,8 +156,4 @@ public class OptimizationService {
         actionRepository.save(entity);
     }
 
-    // Optional helper for unit testing
-    public List<OptimizationRecommendation> optimizeSingleNode(TrafficData data) {
-        return evaluateNode(data);
-    }
 }
