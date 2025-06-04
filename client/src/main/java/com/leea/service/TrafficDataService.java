@@ -46,7 +46,7 @@ public class TrafficDataService {
     }
 
     public List<TrafficData> getTrafficDataInTimeRange(LocalDateTime start, LocalDateTime end) {
-        return repository.findByTimeStampBetween(start, end);
+        return repository.findByTimestampBetween(start, end);
     }
 
     public List<TrafficData> getRecentTrafficDataByNode(Integer nodeId, int hours) {

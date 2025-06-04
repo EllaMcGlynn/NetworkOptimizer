@@ -19,7 +19,7 @@ public interface TrafficDataRepo extends JpaRepository<TrafficData, Long> {
 
     List<TrafficData> findByNodeIdAndNetworkId(Integer nodeId, Integer networkId);
 
-    List<TrafficData> findByTimeStampBetween(LocalDateTime start, LocalDateTime end);
+    List<TrafficData> findByTimestampBetween(LocalDateTime start, LocalDateTime end);
 
     @Query("SELECT t FROM TrafficData t WHERE t.nodeId = :nodeId AND t.timestamp >= :since ORDER BY t.timestamp DESC")
     List<TrafficData> findRecentByNodeId(@Param("nodeId") Integer nodeId, @Param("since") LocalDateTime since);

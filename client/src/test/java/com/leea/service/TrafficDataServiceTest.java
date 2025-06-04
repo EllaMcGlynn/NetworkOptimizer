@@ -110,14 +110,14 @@ class TrafficDataServiceTest {
         // Given
         LocalDateTime start = LocalDateTime.now().minusHours(2);
         LocalDateTime end = LocalDateTime.now();
-        when(trafficDataRepo.findByTimeStampBetween(start, end)).thenReturn(Arrays.asList(trafficData1, trafficData2));
+        when(trafficDataRepo.findByTimestampBetween(start, end)).thenReturn(Arrays.asList(trafficData1, trafficData2));
 
         // When
         List<TrafficData> result = trafficDataService.getTrafficDataInTimeRange(start, end);
 
         // Then
         assertEquals(2, result.size());
-        verify(trafficDataRepo, times(1)).findByTimeStampBetween(start, end);
+        verify(trafficDataRepo, times(1)).findByTimestampBetween(start, end);
     }
 
     @Test
