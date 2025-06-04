@@ -34,6 +34,7 @@ pipeline {
 
         stage("Deploy") {
             steps {
+                sh "docker compose down --rmi=all"
                 sh "docker compose up --build"
             }
         }
