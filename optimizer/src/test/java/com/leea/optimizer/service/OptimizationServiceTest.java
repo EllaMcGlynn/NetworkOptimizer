@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -38,25 +39,23 @@ public class OptimizationServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    private TrafficData buildTraffic(double cpuUsage, double memUsage, double bwUsage,
-                                     double cpuAllocated, double memAllocated, double bwAllocated) {
+    private TrafficData buildTraffic(Map<String, Double> resourceUsage, Map<String, Double> resourceAllocated) {
         TrafficData d = new TrafficData();
         d.setNodeId(1);
         d.setNetworkId(1);
-        d.setCpuUsage(cpuUsage);
-        d.setCpuAllocated(cpuAllocated);
-        d.setMemoryUsage(memUsage);
-        d.setMemoryAllocated(memAllocated);
-        d.setBandwidthUsage(bwUsage);
-        d.setBandwidthAllocated(bwAllocated);
+        d.setResourceAllocated(resourceAllocated);
+        d.setResourceUsage(resourceUsage);
         d.setTimestamp(LocalDateTime.now());
         return d;
     }
 
     @Test
     public void testHighUsageTriggersAutoAction() {
-        when(kafkaConsumer.getRecentData()).thenReturn(List.of(
-                buildTraffic(90, 40, 20, 100, 100, 100)
+    	when(kafkaConsumer.getRecentData()).thenReturn(List.of(
+                buildTraffic(
+                    Map.of("cpu", 90.0, "memory", 40.0, "bandwidth", 20.0),
+                    Map.of("cpu", 100.0, "memory", 100.0, "bandwidth", 100.0)
+                )
         ));
         when(modeService.getCurrentMode()).thenReturn(OptimizerMode.AUTO);
 
@@ -68,8 +67,11 @@ public class OptimizationServiceTest {
 
     @Test
     public void testLowUsageTriggersAutoAction() {
-        when(kafkaConsumer.getRecentData()).thenReturn(List.of(
-                buildTraffic(30, 40, 20, 100, 100, 100)
+    	when(kafkaConsumer.getRecentData()).thenReturn(List.of(
+                buildTraffic(
+                    Map.of("cpu", 30.0, "memory", 40.0, "bandwidth", 20.0),
+                    Map.of("cpu", 100.0, "memory", 100.0, "bandwidth", 100.0)
+                )
         ));
         when(modeService.getCurrentMode()).thenReturn(OptimizerMode.AUTO);
 
@@ -79,8 +81,11 @@ public class OptimizationServiceTest {
 
     @Test
     public void testGoodUsageTriggersNoActionInAutoMode() {
-        when(kafkaConsumer.getRecentData()).thenReturn(List.of(
-                buildTraffic(60, 60, 50, 100, 100, 100)
+    	when(kafkaConsumer.getRecentData()).thenReturn(List.of(
+                buildTraffic(
+                    Map.of("cpu", 60.0, "memory", 60.0, "bandwidth", 50.0),
+                    Map.of("cpu", 100.0, "memory", 100.0, "bandwidth", 100.0)
+                )
         ));
         when(modeService.getCurrentMode()).thenReturn(OptimizerMode.AUTO);
 
@@ -90,8 +95,11 @@ public class OptimizationServiceTest {
 
     @Test
     public void testManualModeDisablesAutoActions() {
-        when(kafkaConsumer.getRecentData()).thenReturn(List.of(
-                buildTraffic(90, 30, 20, 100, 100, 100)
+    	when(kafkaConsumer.getRecentData()).thenReturn(List.of(
+                buildTraffic(
+                    Map.of("cpu", 90.0, "memory", 30.0, "bandwidth", 20.0),
+                    Map.of("cpu", 100.0, "memory", 100.0, "bandwidth", 100.0)
+                )
         ));
         when(modeService.getCurrentMode()).thenReturn(OptimizerMode.MANUAL);
 
