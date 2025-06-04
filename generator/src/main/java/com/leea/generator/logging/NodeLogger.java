@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 
 
 public class NodeLogger {
-    private static final String LOG_DIR = "src/main/java/com/leea/generator/logging/node-logs/";
+    private static final String LOG_DIR = "generator/src/main/java/com/leea/generator/logging/node-logs";
 
 
 
