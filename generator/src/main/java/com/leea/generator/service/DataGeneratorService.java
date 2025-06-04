@@ -6,8 +6,7 @@ import com.leea.generator.logging.NodeLogger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -33,7 +32,7 @@ public class DataGeneratorService {
         }
     }
 
-    @Scheduled(fixedRate = 2000)
+    @Scheduled(fixedRate = 20000)
     public void genAndSendData() {
         for ( int nodeId : allocationMap.keySet() ) {
             Map<String, Double> allocated = allocationMap.get(nodeId);
@@ -49,7 +48,7 @@ public class DataGeneratorService {
             data.networkId = 100 + nodeId;
             data.resourceAllocated = allocated;
             data.resourceUsage = usage;
-            data.timestamp = LocalDateTime.now();
+            data.timestamp = Instant.now();
 
             NodeLogger.log(data);
 
