@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 import com.leea.models.TrafficData;
 
 public class MessageLogger {
-	private static final String LOG_DIR = "generator/src/main/java/com/leea/subscriber/logging/message-logs/";
+    private static final String LOG_DIR = "subscriber/src/main/java/com/leea/subscriber/logging/message-logs/";
 
 
 
@@ -30,6 +30,7 @@ public class MessageLogger {
                 data.getNetworkId(),
                 data.getResourceUsage().toString(),
                 data.getResourceAllocated().toString()
+
         );
 
         try (FileWriter writer = new FileWriter(filename, true)) {
@@ -39,11 +40,11 @@ public class MessageLogger {
             e.printStackTrace();
         }
     }
-    
+
     public static void logError(String logEntry) {
-    	String filename = LOG_DIR + "message-errors.log";
-    	
-    	try (FileWriter writer = new FileWriter(filename, true)) {
+        String filename = LOG_DIR + "message-errors.log";
+
+        try (FileWriter writer = new FileWriter(filename, true)) {
             writer.write(logEntry);
         } catch (IOException e) {
             System.err.println("Failed to write log for error " + logEntry);

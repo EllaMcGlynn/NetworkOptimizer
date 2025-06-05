@@ -21,16 +21,16 @@ public class KafkaConsumerService {
 	@KafkaListener(topics = "resource-usage-data", groupId = "consumer-group")
 	public void listen(String message) throws JsonProcessingException {
 		try {
-		    ObjectMapper mapper = new ObjectMapper();
-		    mapper.registerModule(new JavaTimeModule());
-		    TrafficData data = mapper.readValue(message, TrafficData.class);
-		    
-		    if (data.getResourceAllocated() == null || data.getResourceUsage() == null || data.getTimestamp() == null) {
-		    	MessageLogger.logError("null value found entry " + data.getId() + " skipped");
-		    }else {
-		    	repository.save(data);
-			    MessageLogger.log(data);
-		    }
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.registerModule(new JavaTimeModule());
+			TrafficData data = mapper.readValue(message, TrafficData.class);
+
+			if (data.getResourceAllocated() == null || data.getResourceUsage() == null || data.getTimestamp() == null) {
+				MessageLogger.logError("null value found entry " + data.getId() + " skipped");
+			}else {
+				repository.save(data);
+				MessageLogger.log(data);
+			}
 		} catch (JsonParseException  e) {
 			e.printStackTrace();
 		}

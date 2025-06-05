@@ -16,6 +16,8 @@ public class ActionKafkaProducer {
 
     public void sendAction(OptimizerAction action) {
         kafkaTemplate.send("optimizer-actions", action);
+        System.out.println("Sugestion Sent ");
     }
+
 }
 

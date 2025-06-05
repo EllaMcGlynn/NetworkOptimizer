@@ -10,6 +10,7 @@ spring:
     consumer:
       group-id: generator-group
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: latest
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring:

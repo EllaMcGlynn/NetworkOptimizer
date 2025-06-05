@@ -15,34 +15,34 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import java.util.HashMap;
 import java.util.Map;
 
-    @Configuration
-    public class KafkaConsumerConfig {
+@Configuration
+public class KafkaConsumerConfig {
 
-        @Bean
-        public ConcurrentKafkaListenerContainerFactory<String, OptimizerAction> actionKafkaListenerContainerFactory(
-                ConsumerFactory<String, OptimizerAction> actionConsumerFactory) {
-            ConcurrentKafkaListenerContainerFactory<String, OptimizerAction> factory = new ConcurrentKafkaListenerContainerFactory<>();
-            factory.setConsumerFactory(actionConsumerFactory);
-            return factory;
-        }
-
-        @Bean
-        public ConsumerFactory<String, OptimizerAction> actionConsumerFactory(
-                ObjectMapper objectMapper,
-                @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers) {
-
-            Map<String, Object> props = new HashMap<>();
-            props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-            props.put(ConsumerConfig.GROUP_ID_CONFIG, "generator-group");
-            props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-            props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-            props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
-
-            JsonDeserializer<OptimizerAction> deserializer =
-                    new JsonDeserializer<>(OptimizerAction.class, objectMapper, false);
-
-            return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
-        }
-
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, OptimizerAction> actionKafkaListenerContainerFactory(
+            ConsumerFactory<String, OptimizerAction> actionConsumerFactory) {
+        ConcurrentKafkaListenerContainerFactory<String, OptimizerAction> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(actionConsumerFactory);
+        return factory;
     }
+
+    @Bean
+    public ConsumerFactory<String, OptimizerAction> actionConsumerFactory(
+            ObjectMapper objectMapper,
+            @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers) {
+
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "generator-group");
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+
+        JsonDeserializer<OptimizerAction> deserializer =
+                new JsonDeserializer<>(OptimizerAction.class, objectMapper, false);
+
+        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
+    }
+
+}
 

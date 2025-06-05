@@ -14,7 +14,7 @@ public class ActionConsumer {
         this.dataGeneratorService = dataGeneratorService;
     }
 
-    @KafkaListener(topics = "optimizer-actions", groupId = "generator-group", containerFactory = "actionKafkaListenerContainerFactory")
+    @KafkaListener(topics = "optimizer-actions", groupId = "generator-group")
     public void consume(OptimizerAction action) {
         System.out.println("Received action");
         dataGeneratorService.applyOptimizerAction(action);
