@@ -10,7 +10,6 @@
   <modules>
     <module>client</module>
     <module>generator</module>
-    <module>optimizer</module>
     <module>subscriber</module>
   </modules>
   <dependencyManagement>

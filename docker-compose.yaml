@@ -14,17 +14,10 @@ services:
     networks:
       - aura-network
 
-  optimizer:
-    build: ./optimizer
-    ports:
-      - "8083:8080"
-    networks:
-      - aura-network
-
   subscriber:
     build: ./subscriber
     ports:
-      - "8084:8080"
+      - "8083:8080"
     networks:
       - aura-network
 
