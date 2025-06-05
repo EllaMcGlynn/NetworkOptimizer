@@ -19,6 +19,7 @@ public class ActionKafkaProducer {
     public void sendAction(OptimizerAction action) {
         try {
 
+            System.out.println("Sending action "+ action.toString());
             String json = new ObjectMapper().writeValueAsString(action);
             System.out.println("Sending action: " + json);
             kafkaTemplate.send("optimizer-actions", json);
