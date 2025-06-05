@@ -3,6 +3,54 @@ package com.leea.optimizer.models;
 import java.time.LocalDateTime;
 
 public class OptimizerAction {
+    public Integer getNodeId() {
+        return nodeId;
+    }
+
+    public void setNodeId(Integer nodeId) {
+        this.nodeId = nodeId;
+    }
+
+    public String getResourceType() {
+        return resourceType;
+    }
+
+    public void setResourceType(String resourceType) {
+        this.resourceType = resourceType;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    public String getActionType() {
+        return actionType;
+    }
+
+    public void setActionType(String actionType) {
+        this.actionType = actionType;
+    }
+
+    public String getExecutedBy() {
+        return executedBy;
+    }
+
+    public void setExecutedBy(String executedBy) {
+        this.executedBy = executedBy;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
+    }
+
     private Integer nodeId;
     private String resourceType;
     private double amount;
@@ -10,45 +58,5 @@ public class OptimizerAction {
     private String executedBy; // USER or OPTIMIZER
     private LocalDateTime timestamp;
 
-    public void setNodeId(Integer nodeId) {
-    }
 
-    public void setResourceType(String resourceType) {
-    }
-
-    public void setAmount(double change) {
-    }
-
-    public void setActionType(String actionType) {
-    }
-
-    public void setExecutedBy(String optimizer) {
-    }
-
-    public void setTimestamp(LocalDateTime now) {
-    }
-
-    public Integer getNodeId() {
-        return nodeId;
-    }
-
-    public String getResourceType() {
-        return resourceType;
-    }
-
-    public double getAmount() {
-        return amount;
-    }
-
-    public String getActionType() {
-        return actionType;
-    }
-
-    public String getExecutedBy() {
-        return executedBy;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
 }
