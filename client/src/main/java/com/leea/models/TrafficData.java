@@ -94,7 +94,7 @@ public class TrafficData {
         this.timestamp = timestamp;
     }
 
-    //Methods for resource types (could be helpful later if we do something extra to show-off)
+    //Methods for resource types
     public Double getCpuUsage() {
         return resourceUsage !=null ? resourceUsage.get("cpu") : null;
     }
@@ -104,7 +104,7 @@ public class TrafficData {
     }
 
     public Double getBandwidthUsage() {
-        return resourceUsage !=null ? resourceUsage.get("bandwidth") : null;
+        return resourceUsage !=null ? resourceUsage.get("bandwith") : null;
     }
 
     public Double getCpuAllocated() {
@@ -116,6 +116,6 @@ public class TrafficData {
     }
 
     public Double getBandwidthAllocated() {
-        return resourceAllocated !=null ? resourceAllocated.get("bandwidth") : null;
+        return resourceAllocated !=null ? resourceAllocated.get("bandwith") : null;
     }
 }
