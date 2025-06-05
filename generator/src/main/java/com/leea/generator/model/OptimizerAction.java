@@ -17,7 +17,6 @@ public class OptimizerAction {
     public void setNodeId(Integer nodeId) {
         this.nodeId = nodeId;
     }
-
     public String getResourceType() {
         return resourceType;
     }
