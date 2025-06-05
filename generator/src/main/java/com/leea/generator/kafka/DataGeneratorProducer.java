@@ -8,8 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataGeneratorProducer {
 
-    @Value("${app.kafka.topic}")
-    private String topic;
+    private static final String TOPIC = "resource-usage-data";
 
     private final KafkaTemplate<String, DataGenerator> kafkaTemplate;
 
@@ -18,7 +17,7 @@ public class DataGeneratorProducer {
     }
 
     public void send(DataGenerator data) {
-        kafkaTemplate.send(topic, data);
+        //System.out.print("Sent data");
+        kafkaTemplate.send(TOPIC, data);
     }
-
 }

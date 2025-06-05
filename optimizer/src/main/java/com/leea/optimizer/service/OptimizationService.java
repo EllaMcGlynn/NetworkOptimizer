@@ -7,6 +7,7 @@ import com.leea.optimizer.entity.OptimizationRecommendationEntity;
 import com.leea.optimizer.repository.ActionRepository;
 import com.leea.optimizer.repository.RecommendationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -32,37 +33,78 @@ public class OptimizationService {
     @Autowired
     private ActionRepository actionRepository;
 
+
     public List<OptimizationRecommendation> optimize() {
+        System.out.println("Optimiser called");
         List<TrafficData> recentData = kafkaConsumer.getRecentData();
-        List<OptimizationRecommendation> recommendations = new ArrayList<>();
+        List<OptimizationRecommendation> allRecommendations = new ArrayList<>();
+        Map<Integer, OptimizationRecommendation> bestRecPerNode = new java.util.HashMap<>();
 
         for (TrafficData data : recentData) {
-            for (OptimizationRecommendation rec : evaluateNode(data)) {
-                recommendations.add(rec);
+            List<OptimizationRecommendation> recs = evaluateNode(data);
+
+            for (OptimizationRecommendation rec : recs) {
+                System.out.println("Optimiser checking ");
+                allRecommendations.add(rec);
                 saveRecommendationToDB(rec);
 
                 if (modeService.getCurrentMode() == OptimizerMode.AUTO) {
                     NodeStatus status = getNodeStatus(rec);
                     if (status == NodeStatus.HIGH || status == NodeStatus.LOW) {
-                        OptimizerAction action = createActionFromRecommendation(rec, status);
-                        actionProducer.sendAction(action);
-                        saveActionToDB(action);
+                        int nodeId = rec.getNodeId();
+                        OptimizationRecommendation existing = bestRecPerNode.get(nodeId);
+
+                        if (existing == null || isMoreCritical(rec, existing)) {
+                            bestRecPerNode.put(nodeId, rec);
+                        }
                     }
                 }
             }
         }
-        return recommendations;
+
+        for (OptimizationRecommendation rec : bestRecPerNode.values()) {
+            NodeStatus status = getNodeStatus(rec);
+            OptimizerAction action = createActionFromRecommendation(rec, status);
+            System.out.println("Optimiser Making suggestion");
+            actionProducer.sendAction(action);
+            saveActionToDB(action);
+            System.out.println("Suggestion Sent");
+        }
+
+        return allRecommendations;
     }
+
+    private boolean isMoreCritical(OptimizationRecommendation newRec, OptimizationRecommendation existingRec) {
+        double newDeviation = Math.abs(newRec.getCurrentUsage() / newRec.getCurrentAllocation() - 1);
+        double existingDeviation = Math.abs(existingRec.getCurrentUsage() / existingRec.getCurrentAllocation() - 1);
+        return newDeviation > existingDeviation;
+    }
+
 
     private List<OptimizationRecommendation> evaluateNode(TrafficData data) {
         List<OptimizationRecommendation> recs = new ArrayList<>();
         Map<String, Double> usage = data.getResourceUsage();
         Map<String, Double> allocated = data.getResourceAllocated();
-        recs.add(makeRecommendation(data, "CPU", usage.get("cpu"), allocated.get("cpu")));
-        recs.add(makeRecommendation(data, "Memory", usage.get("memory"), allocated.get("memory")));
-        recs.add(makeRecommendation(data, "Bandwidth", usage.get("bandwidth"), allocated.get("bandwidth")));
+        
+        // Only add recommendations if both usage and allocation exist and are non-null
+        if (usage != null && allocated != null) {
+            addRecommendationIfNeeded(recs, data, "CPU", usage.get("CPU"), allocated.get("CPU"));
+            addRecommendationIfNeeded(recs, data, "Memory", usage.get("Memory"), allocated.get("Memory"));
+            addRecommendationIfNeeded(recs, data, "Bandwith", usage.get("Bandwith"), allocated.get("Bandwith"));
+        }
         return recs;
     }
+
+    private void addRecommendationIfNeeded(List<OptimizationRecommendation> recs, TrafficData data, 
+                                     String type, Double usage, Double allocated) {
+    if (usage != null && allocated != null && allocated > 0) {
+        OptimizationRecommendation rec = makeRecommendation(data, type, usage, allocated);
+        // Only add if there's an actual change needed
+        if (Math.abs(rec.getRecommendedAllocation() - rec.getCurrentAllocation()) > 0.0001) {
+            recs.add(rec);
+        }
+    }
+}
 
     private OptimizationRecommendation makeRecommendation(TrafficData data, String type, double usage, double allocated) {
         double ratio = usage / allocated;
@@ -73,20 +115,20 @@ public class OptimizationService {
 
         switch (type) {
             case "CPU":
-                increaseThreshold = 0.85;
-                decreaseThreshold = 0.40;
+                increaseThreshold = 0.90;
+                decreaseThreshold = 0.10;
                 break;
             case "Memory":
                 increaseThreshold = 0.90;
-                decreaseThreshold = 0.50;
+                decreaseThreshold = 0.10;
                 break;
-            case "Bandwidth":
-                increaseThreshold = 0.80;
-                decreaseThreshold = 0.30;
+            case "Bandwith":
+                increaseThreshold = 0.90;
+                decreaseThreshold = 0.10;
                 break;
             default:
-                increaseThreshold = 0.80;
-                decreaseThreshold = 0.30;
+                increaseThreshold = 0.90;
+                decreaseThreshold = 0.10;
         }
 
         if (ratio > increaseThreshold) {
@@ -114,7 +156,7 @@ public class OptimizationService {
                 return ratio > 0.85 ? NodeStatus.HIGH : ratio < 0.40 ? NodeStatus.LOW : NodeStatus.GOOD;
             case "Memory":
                 return ratio > 0.90 ? NodeStatus.HIGH : ratio < 0.50 ? NodeStatus.LOW : NodeStatus.GOOD;
-            case "Bandwidth":
+            case "Bandwith":
                 return ratio > 0.80 ? NodeStatus.HIGH : ratio < 0.30 ? NodeStatus.LOW : NodeStatus.GOOD;
             default:
                 return NodeStatus.GOOD;
@@ -122,17 +164,18 @@ public class OptimizationService {
     }
 
     private OptimizerAction createActionFromRecommendation(OptimizationRecommendation rec, NodeStatus status) {
+        // Calculate the absolute difference between recommended and current allocation
         double change = Math.abs(rec.getRecommendedAllocation() - rec.getCurrentAllocation());
-        String actionType = status == NodeStatus.HIGH ? "INCREASE" : "DECREASE";
-
+        
+        // Create action with the correct amount
         OptimizerAction action = new OptimizerAction();
         action.setNodeId(rec.getNodeId());
         action.setResourceType(rec.getResourceType());
-        action.setAmount(change);
-        action.setActionType(actionType);
+        action.setAmount(change);  // This will now have the actual change amount
+        action.setActionType(status == NodeStatus.HIGH ? "INCREASE" : "DECREASE");
         action.setExecutedBy("OPTIMIZER");
         action.setTimestamp(LocalDateTime.now());
-
+        
         return action;
     }
 
@@ -158,5 +201,13 @@ public class OptimizationService {
         entity.setTimestamp(action.getTimestamp());
         actionRepository.save(entity);
     }
+
+    @Scheduled(fixedRate = 10000) // every 10 seconds
+    public void scheduledOptimization() {
+        optimize();
+    }
+
+
+
 
 }

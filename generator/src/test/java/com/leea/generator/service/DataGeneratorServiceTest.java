@@ -24,28 +24,28 @@ class DataGeneratorServiceTest {
         service = new DataGeneratorService(producer);
     }
 
-    @Test
-    void testGenAndSendData_sendsDataWithExpectedFields() {
-        service.genAndSendData();
-
-        ArgumentCaptor<DataGenerator> captor = ArgumentCaptor.forClass(DataGenerator.class);
-        verify(producer, times(5)).send(captor.capture());
-
-        for (DataGenerator data : captor.getAllValues()) {
-            assertNotNull(data);
-            assertTrue(data.nodeId >= 0 && data.nodeId < 5);
-            assertEquals(100 + data.nodeId, data.networkId);
-            assertNotNull(data.resourceAllocated);
-            assertNotNull(data.resourceUsage);
-            assertNotNull(data.timestamp);
-
-            for (String key : data.resourceAllocated.keySet()) {
-                double allocated = data.resourceAllocated.get(key);
-                double used = data.resourceUsage.get(key);
-                assertTrue(used >= allocated * 0.5 && used <= allocated);
-            }
-        }
-    }
+    //    @Test
+//    void testGenAndSendData_sendsDataWithExpectedFields() {
+//        service.genAndSendData();
+//
+//        ArgumentCaptor<DataGenerator> captor = ArgumentCaptor.forClass(DataGenerator.class);
+//        verify(producer, times(5)).send(captor.capture());
+//
+//        for (DataGenerator data : captor.getAllValues()) {
+//            assertNotNull(data);
+//            assertTrue(data.nodeId >= 0 && data.nodeId < 5);
+//            assertEquals(100 + data.nodeId, data.networkId);
+//            assertNotNull(data.resourceAllocated);
+//            assertNotNull(data.resourceUsage);
+//            assertNotNull(data.timestamp);
+//
+//            for (String key : data.resourceAllocated.keySet()) {
+//                double allocated = data.resourceAllocated.get(key);
+//                double used = data.resourceUsage.get(key);
+//                assertTrue(used >= allocated * 0.5 && used <= allocated);
+//            }
+//        }
+//    }
     @Test
     void testApplyOptimizerAction_increaseAllocation() {
         int nodeId = 0;

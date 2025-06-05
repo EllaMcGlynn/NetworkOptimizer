@@ -21,7 +21,7 @@ import com.leea.repo.DataRepo;
 @AutoConfigureMockMvc
 class KafkaConsumerServiceTest {
 
-	@Autowired
+    @Autowired
     private KafkaConsumerService kafkaConsumerService;
 
     @MockBean
@@ -29,7 +29,7 @@ class KafkaConsumerServiceTest {
 
     @Test
     public void testKafkaMessageProcessing() throws JsonProcessingException {
-    	String jsonMessage = """
+        String jsonMessage = """
             {
                 "nodeId": 1,
                 "networkId": 1,
@@ -42,7 +42,7 @@ class KafkaConsumerServiceTest {
 
         ArgumentCaptor<TrafficData> captor = ArgumentCaptor.forClass(TrafficData.class);
         verify(repository, times(1)).save(captor.capture());
-        
+
         TrafficData saved = captor.getValue();
         assertEquals(1, saved.getNodeId());
         assertEquals(1, saved.getNetworkId());
@@ -51,10 +51,10 @@ class KafkaConsumerServiceTest {
         assertEquals(70.0, saved.getResourceAllocated().get("cpu"));
         assertEquals(30.5, saved.getResourceAllocated().get("memory"));
     }
-    
+
     @Test
     public void testErrorHandling() throws JsonProcessingException{
-    	String jsonMessage1 = """
+        String jsonMessage1 = """
                 {
                     "nodeId": 1,
                     "networkId": 1,
@@ -64,7 +64,7 @@ class KafkaConsumerServiceTest {
                 }
             """;
         kafkaConsumerService.listen(jsonMessage1);
-            
+
         String jsonMessage2 = """
                 {
                     "nodeId": 1,
@@ -75,8 +75,8 @@ class KafkaConsumerServiceTest {
                 }
             """;
         kafkaConsumerService.listen(jsonMessage2);
-        
+
         verify(repository, times(0)).save(any());
     }
-    
+
 }

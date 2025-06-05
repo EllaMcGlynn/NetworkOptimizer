@@ -8,7 +8,7 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
-# MySQL Configuration
+  # MySQL Configuration
   datasource:
     url: jdbc:mysql://localhost:3306/traffic_base
     username: root
@@ -17,5 +17,5 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update 
+      ddl-auto: update
     show-sql: true

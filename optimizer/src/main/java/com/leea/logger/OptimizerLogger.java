@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 import com.leea.optimizer.models.TrafficData;
 
 public class OptimizerLogger {
-	private static final String LOG_DIR = "/src/main/java/com/leea/subscriber/logging/message-logs/";
+    private static final String LOG_DIR = "message-logs/";
 
 
 
@@ -39,11 +39,11 @@ public class OptimizerLogger {
             e.printStackTrace();
         }
     }
-    
+
     public static void logError(String logEntry) {
-    	String filename = LOG_DIR + "message-errors.log";
-    	
-    	try (FileWriter writer = new FileWriter(filename, true)) {
+        String filename = LOG_DIR + "message-errors.log";
+
+        try (FileWriter writer = new FileWriter(filename, true)) {
             writer.write(logEntry);
         } catch (IOException e) {
             System.err.println("Failed to write log for error " + logEntry);

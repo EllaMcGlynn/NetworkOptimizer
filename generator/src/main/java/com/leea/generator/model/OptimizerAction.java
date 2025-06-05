@@ -6,8 +6,8 @@ public class OptimizerAction {
     private Integer nodeId;
     private String resourceType;
     private double amount;
-    private String actionType; // INCREASE or DECREASE
-    private String executedBy; // USER or OPTIMIZER
+    private String actionType;
+    private String executedBy;
     private LocalDateTime timestamp;
 
     public Integer getNodeId() {
@@ -56,5 +56,17 @@ public class OptimizerAction {
 
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
+    }
+
+    @Override
+    public String toString() {
+        return "OptimizerAction{" +
+                "nodeId=" + nodeId +
+                ", resourceType='" + resourceType + '\'' +
+                ", amount=" + amount +
+                ", actionType='" + actionType + '\'' +
+                ", executedBy='" + executedBy + '\'' +
+                ", timestamp=" + timestamp +
+                '}';
     }
 }

@@ -33,7 +33,7 @@ public class DataGeneratorService {
         }
     }
 
-    @Scheduled(fixedRate = 20000)
+    @Scheduled(fixedRate = 2000)
     public void genAndSendData() {
         for (int nodeId : allocationMap.keySet()) {
             Map<String, Double> allocated = allocationMap.get(nodeId);
