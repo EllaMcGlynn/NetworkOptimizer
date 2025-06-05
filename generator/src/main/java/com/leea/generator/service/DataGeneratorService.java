@@ -3,6 +3,7 @@ package com.leea.generator.service;
 import com.leea.generator.model.DataGenerator;
 import com.leea.generator.kafka.DataGeneratorProducer;
 import com.leea.generator.logging.NodeLogger;
+import com.leea.generator.model.OptimizerAction;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -55,4 +56,17 @@ public class DataGeneratorService {
             dataGeneratorProducer.send(data);
         }
     }
+    public void applyOptimizerAction(OptimizerAction action) {
+        allocationMap.computeIfPresent(action.getNodeId(), (id, currentAlloc) -> {
+            Map<String, Double> updated = new HashMap<>(currentAlloc);
+            double current = updated.getOrDefault(action.getResourceType(), 0.0);
+            double newValue = "INCREASE".equalsIgnoreCase(action.getActionType())
+                    ? current + action.getAmount()
+                    : Math.max(0.0, current - action.getAmount());
+            updated.put(action.getResourceType(), newValue);
+            return updated;
+        });
+    }
+
+
 }
