@@ -154,4 +154,10 @@ public class TrafficDataService {
 
         return new ResourceUsageStats(0, 0, avgBandwidthUsage, 0, 0, maxBandwidthUsage);
     }
+
+    public Optional<TrafficData> getMostRecentTrafficDataByNode(Integer nodeId) {
+        List<TrafficData> results = repository
+                .findTopByNodeIdOrderByTimestampDesc(nodeId, PageRequest.of(0, 1));
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+    }
 }

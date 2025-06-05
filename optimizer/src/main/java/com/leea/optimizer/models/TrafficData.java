@@ -31,4 +31,35 @@ public class TrafficData {
         this.timestamp = timestamp;
     }
 
+    public Integer getNodeId() {
+        return nodeId;
+    }
+
+    public void setNodeId(Integer nodeId) {
+        this.nodeId = nodeId;
+    }
+
+    public Integer getNetworkId() {
+        return networkId;
+    }
+
+    public void setNetworkId(Integer networkId) {
+        this.networkId = networkId;
+    }
+
+    public Map<String, Double> getResourceUsage() {
+        return resourceUsage;
+    }
+
+    public void setResourceUsage(Map<String, Double> resourceUsage) {
+        this.resourceUsage = resourceUsage;
+    }
+
+    public Map<String, Double> getResourceAllocated() {
+        return resourceAllocated;
+    }
+
+    public void setResourceAllocated(Map<String, Double> resourceAllocated) {
+        this.resourceAllocated = resourceAllocated;
+    }
 }
