@@ -160,4 +160,9 @@ public class TrafficDataService {
                 .findTopByNodeIdOrderByTimestampDesc(nodeId, PageRequest.of(0, 1));
         return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
     }
+
+    public List<TrafficData> getRecentUsageForAllNodes() {
+        return repository.findTop30ByOrderByTimestampDesc();
+    }
+
 }

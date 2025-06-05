@@ -15,34 +15,35 @@
             <img src="Auralogo.png" id="logo" alt="Aura Logo">
             <h1 class="h3 mb-0">AURA Optimizer</h1>
         </div>
-        <button id="toggleModeBtn" class="btn btn-outline-light">Loading...</button>
     </div>
 </header>
 
 <main class="container py-5">
+    <!-- Alerts & Spinner -->
+    <div id="alertContainer"></div>
+    <div id="toastContainer" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100;"></div>
+    <div id="spinner" class="text-center my-4" style="display: none;">
+        <div class="spinner-border text-success" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
 
     <section class="mb-5">
-        <h2 class="h4 mb-4">Resource Usage Over Time</h2>
-
-        <div class="chart-container">
-            <h3 class="chart-title">CPU Usage (%)</h3>
+        <div class="chart-card">
+            <h3 class="chart-title mb-3">CPU Usage Over Time</h3>
             <canvas id="cpuChart"></canvas>
         </div>
 
-        <div class="chart-container">
-            <h3 class="chart-title">Memory Usage (GB)</h3>
+        <div class="chart-card">
+            <h3 class="chart-title mb-3">Memory Usage Over Time</h3>
             <canvas id="memoryChart"></canvas>
         </div>
 
-        <div class="chart-container">
-            <h3 class="chart-title">Bandwidth Usage (Mbps)</h3>
+        <div class="chart-card">
+            <h3 class="chart-title mb-3">Bandwidth Usage Over Time</h3>
             <canvas id="bandwidthChart"></canvas>
         </div>
-    </section>
-
-    <section class="mb-4">
-        <h2 class="h4 mb-3">Automated Usage & Resource Allocation</h2>
-        <p>Current Configuration: <strong id="currentMode">...</strong></p>
     </section>
 
     <section class="mb-5">
@@ -53,23 +54,24 @@
     </section>
 
     <section class="mb-5">
-        <h2 class="h4 mb-3">Node Recommendations</h2>
-        <div class="row row-cols-1 g-4" id="nodeContainer">
-            <!-- Grouped node cards go here -->
-            <div class="col">
-                <div class="card">
-                    <div class="card-header bg-light">
-                        <h3 class="h6 mb-0">System Status</h3>
-                    </div>
-                    <div class="card-body">
-                        <div id="recommendationsContent">
-                            <p class="text-muted">Node recommendations will appear here after analysis</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <h2 class="h4 mb-3">Optimization Suggestions</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="recommendationTable">
+                <thead class="table-light">
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Node ID</th>
+                    <th>Resource</th>
+                    <th>Usage</th>
+                    <th>Allocation</th>
+                    <th>Recommendation</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
     </section>
+
 </main>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

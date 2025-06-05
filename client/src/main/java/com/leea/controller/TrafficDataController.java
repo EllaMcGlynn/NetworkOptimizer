@@ -112,4 +112,11 @@ public class TrafficDataController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/usage-history/all")
+    public ResponseEntity<List<TrafficData>> getAllRecentUsageHistory() {
+        List<TrafficData> history = trafficDataService.getRecentUsageForAllNodes();
+        return ResponseEntity.ok(history);
+    }
+
+
 }

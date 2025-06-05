@@ -30,4 +30,7 @@ public interface TrafficDataRepo extends JpaRepository<TrafficData, Long> {
     @Query("SELECT t FROM TrafficData t WHERE t.nodeId = :nodeId ORDER BY t.timestamp DESC")
     List<TrafficData> findTopByNodeIdOrderByTimestampDesc(@Param("nodeId") Integer nodeId, Pageable pageable);
 
+    List<TrafficData> findTop30ByOrderByTimestampDesc();
+
+
 }
