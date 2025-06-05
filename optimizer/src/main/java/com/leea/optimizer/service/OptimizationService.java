@@ -149,17 +149,18 @@ public class OptimizationService {
     }
 
     private OptimizerAction createActionFromRecommendation(OptimizationRecommendation rec, NodeStatus status) {
+        // Calculate the absolute difference between recommended and current allocation
         double change = Math.abs(rec.getRecommendedAllocation() - rec.getCurrentAllocation());
-        String actionType = status == NodeStatus.HIGH ? "INCREASE" : "DECREASE";
-
+        
+        // Create action with the correct amount
         OptimizerAction action = new OptimizerAction();
         action.setNodeId(rec.getNodeId());
         action.setResourceType(rec.getResourceType());
-        action.setAmount(change);
-        action.setActionType(actionType);
+        action.setAmount(change);  // This will now have the actual change amount
+        action.setActionType(status == NodeStatus.HIGH ? "INCREASE" : "DECREASE");
         action.setExecutedBy("OPTIMIZER");
         action.setTimestamp(LocalDateTime.now());
-
+        
         return action;
     }
 

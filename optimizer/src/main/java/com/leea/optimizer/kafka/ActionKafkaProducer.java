@@ -8,19 +8,18 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ActionKafkaProducer {
-
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final ObjectMapper objectMapper;
 
-
-    public ActionKafkaProducer(KafkaTemplate<String, String> kafkaTemplate) {
+    public ActionKafkaProducer(KafkaTemplate<String, String> kafkaTemplate, ObjectMapper objectMapper) {
         this.kafkaTemplate = kafkaTemplate;
+        this.objectMapper = objectMapper;
     }
 
     public void sendAction(OptimizerAction action) {
         try {
-
-            System.out.println("Sending action "+ action.toString());
-            String json = new ObjectMapper().writeValueAsString(action);
+            System.out.println("Sending action " + action.toString());
+            String json = objectMapper.writeValueAsString(action);
             System.out.println("Sending action: " + json);
             kafkaTemplate.send("optimizer-actions", json);
             System.out.println("Suggestion Sent");
@@ -28,8 +27,4 @@ public class ActionKafkaProducer {
             System.err.println("Failed to serialize action: " + e.getMessage());
         }
     }
-
-
-
 }
-
