@@ -17,13 +17,15 @@ public class ActionConsumer {
 
     @KafkaListener(topics = "optimizer-actions", groupId = "generator-group")
     public void consume(String json) {
+        System.out.println("Received action JSON: " + json);
         try {
-            System.out.println("Received action JSON: " + json);
-            OptimizerAction action = new ObjectMapper().readValue(json, OptimizerAction.class);
+            ObjectMapper mapper = new ObjectMapper();
+            OptimizerAction action = mapper.readValue(json, OptimizerAction.class);
             dataGeneratorService.applyOptimizerAction(action);
         } catch (Exception e) {
             System.err.println("Failed to deserialize action: " + e.getMessage());
         }
     }
+
 
 }
