@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import com.leea.models.TrafficData;
+import com.leea.optimizer.models.TrafficData;
 
-public class MessageLogger {
-    private static final String LOG_DIR = "subscriber/src/main/java/com/leea/subscriber/logging/message-logs/";
+public class OptimizerLogger {
+    private static final String LOG_DIR = "message-logs/";
 
 
 
@@ -30,7 +30,6 @@ public class MessageLogger {
                 data.getNetworkId(),
                 data.getResourceUsage().toString(),
                 data.getResourceAllocated().toString()
-
         );
 
         try (FileWriter writer = new FileWriter(filename, true)) {
