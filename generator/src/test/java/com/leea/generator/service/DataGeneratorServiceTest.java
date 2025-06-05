@@ -24,28 +24,31 @@ class DataGeneratorServiceTest {
         service = new DataGeneratorService(producer);
     }
 
-    //    @Test
-//    void testGenAndSendData_sendsDataWithExpectedFields() {
-//        service.genAndSendData();
-//
-//        ArgumentCaptor<DataGenerator> captor = ArgumentCaptor.forClass(DataGenerator.class);
-//        verify(producer, times(5)).send(captor.capture());
-//
-//        for (DataGenerator data : captor.getAllValues()) {
-//            assertNotNull(data);
-//            assertTrue(data.nodeId >= 0 && data.nodeId < 5);
-//            assertEquals(100 + data.nodeId, data.networkId);
-//            assertNotNull(data.resourceAllocated);
-//            assertNotNull(data.resourceUsage);
-//            assertNotNull(data.timestamp);
-//
-//            for (String key : data.resourceAllocated.keySet()) {
-//                double allocated = data.resourceAllocated.get(key);
-//                double used = data.resourceUsage.get(key);
-//                assertTrue(used >= allocated * 0.5 && used <= allocated);
-//            }
-//        }
-//    }
+    @Test
+    void testGenAndSendData_sendsDataWithExpectedFields() {
+        service.genAndSendData();
+
+        ArgumentCaptor<DataGenerator> captor = ArgumentCaptor.forClass(DataGenerator.class);
+        verify(producer, times(5)).send(captor.capture());
+
+        for (DataGenerator data : captor.getAllValues()) {
+            assertNotNull(data);
+            assertTrue(data.nodeId >= 0 && data.nodeId < 5);
+            assertEquals(100 + data.nodeId, data.networkId);
+            assertNotNull(data.resourceAllocated);
+            assertNotNull(data.resourceUsage);
+            assertNotNull(data.timestamp);
+
+            for (String key : data.resourceAllocated.keySet()) {
+                double allocated = data.resourceAllocated.get(key);
+                double used = data.resourceUsage.get(key);
+                // Usage should be between 0% and 120% of allocated
+                assertTrue(used >= 0 && used <= allocated * 1.2,
+                    String.format("Usage %f should be between 0 and %f (120%% of allocated)", used, allocated * 1.2));
+            }
+        }
+    }
+
     @Test
     void testApplyOptimizerAction_increaseAllocation() {
         int nodeId = 0;

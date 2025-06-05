@@ -10,16 +10,15 @@ import org.springframework.stereotype.Component;
 public class ActionConsumer {
 
     private final DataGeneratorService dataGeneratorService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
-    public ActionConsumer(DataGeneratorService dataGeneratorService) {
+    public ActionConsumer(DataGeneratorService dataGeneratorService, ObjectMapper objectMapper) {
         this.dataGeneratorService = dataGeneratorService;
+        this.objectMapper = objectMapper;
     }
 
     @KafkaListener(topics = "optimizer-actions", groupId = "generator-group", containerFactory = "actionKafkaListenerContainerFactory")
-
     public void consume(String actionJson) {
-        //System.out.println("Received action JSON: " + actionJson);
         try {
             OptimizerAction action = objectMapper.readValue(actionJson, OptimizerAction.class);
             dataGeneratorService.applyOptimizerAction(action);
@@ -28,4 +27,3 @@ public class ActionConsumer {
         }
     }
 }
-
