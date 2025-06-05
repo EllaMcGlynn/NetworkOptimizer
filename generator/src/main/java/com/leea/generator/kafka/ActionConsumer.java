@@ -10,22 +10,22 @@ import org.springframework.stereotype.Component;
 public class ActionConsumer {
 
     private final DataGeneratorService dataGeneratorService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public ActionConsumer(DataGeneratorService dataGeneratorService) {
         this.dataGeneratorService = dataGeneratorService;
     }
 
-    @KafkaListener(topics = "optimizer-actions", groupId = "generator-group")
-    public void consume(String json) {
-        System.out.println("Received action JSON: " + json);
+    @KafkaListener(topics = "optimizer-actions", groupId = "generator-group", containerFactory = "actionKafkaListenerContainerFactory")
+
+    public void consume(String actionJson) {
+        System.out.println("Received action JSON: " + actionJson);
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            OptimizerAction action = mapper.readValue(json, OptimizerAction.class);
+            OptimizerAction action = objectMapper.readValue(actionJson, OptimizerAction.class);
             dataGeneratorService.applyOptimizerAction(action);
         } catch (Exception e) {
             System.err.println("Failed to deserialize action: " + e.getMessage());
         }
     }
-
-
 }
+

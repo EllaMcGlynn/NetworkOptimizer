@@ -16,16 +16,7 @@ import java.util.Map;
 public class KafkaConsumerConfig {
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory(
-            ConsumerFactory<String, String> consumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<String, String> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory);
-        return factory;
-    }
-
-    @Bean
-    public ConsumerFactory<String, String> consumerFactory(
+    public ConsumerFactory<String, String> actionConsumerFactory(
             @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers) {
 
         Map<String, Object> props = new HashMap<>();
@@ -36,4 +27,13 @@ public class KafkaConsumerConfig {
 
         return new DefaultKafkaConsumerFactory<>(props);
     }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, String> actionKafkaListenerContainerFactory(
+            ConsumerFactory<String, String> actionConsumerFactory) {
+        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(actionConsumerFactory);
+        return factory;
+    }
+
 }
