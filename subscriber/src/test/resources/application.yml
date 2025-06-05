@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: client
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+
+  h2:
+    console:
+      enabled: true
+
+  kafka:
+    bootstrap-servers: ${MOCK_KAFKA_SERVERS:dummy:9092}
+    consumer:
+      group-id: test-consumer-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
