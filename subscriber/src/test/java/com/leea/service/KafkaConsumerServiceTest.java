@@ -80,3 +80,68 @@
 //    }
 //
 //}
+
+package com.leea.service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.leea.logger.MessageLogger;
+import com.leea.models.TrafficData;
+import com.leea.repo.DataRepo;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockedStatic;
+
+import java.util.Map;
+
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class KafkaConsumerServiceTest {
+
+    @Mock
+    private DataRepo repository;
+
+    @InjectMocks
+    private KafkaConsumerService kafkaConsumerService;
+
+    private ObjectMapper mapper;
+
+    @BeforeEach
+    void setup() {
+        mapper = new ObjectMapper();
+        mapper.findAndRegisterModules(); // Ensures LocalDateTime deserialization works
+    }
+
+    @Test
+    void testValidMessage_savesDataAndLogs() throws JsonProcessingException {
+        String jsonMessage = """
+            {
+              "id": 0,
+              "nodeId": 1,
+              "networkId": 2,
+              "resourceUsage": {
+                "CPU": 75.5,
+                "RAM": 60.2
+              },
+              "resourceAllocated": {
+                "CPU": 100.0,
+                "RAM": 100.0
+              },
+              "timestamp": 1717675200.0
+            }
+        """;
+
+        try (MockedStatic<MessageLogger> loggerMock = mockStatic(MessageLogger.class)) {
+            kafkaConsumerService.listen(jsonMessage);
+
+            verify(repository).save(any(TrafficData.class));
+            loggerMock.verify(() -> MessageLogger.log(any(TrafficData.class)));
+        }
+    }
+
+}
+
