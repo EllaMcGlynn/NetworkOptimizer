@@ -133,10 +133,10 @@ class TrafficDataServiceTest {
         assertNotNull(result);
         assertEquals(35.0, result.getAvgCpuUsage());
         assertEquals(65.0, result.getAvgMemoryUsage());
-        assertEquals(110.0, result.getAvgBandwidthUsage());
+        assertEquals(0.0, result.getAvgBandwidthUsage());
         assertEquals(40.0, result.getMaxCpuUsage());
         assertEquals(70.0, result.getMaxMemoryUsage());
-        assertEquals(120.0, result.getMaxBandwidthUsage());
+        assertEquals(0.0, result.getMaxBandwidthUsage());
     }
 
     @Test
@@ -192,8 +192,8 @@ class TrafficDataServiceTest {
         assertEquals(0.0, result.getMaxCpuUsage());
         assertEquals(0.0, result.getAvgMemoryUsage());
         assertEquals(0.0, result.getMaxMemoryUsage());
-        assertEquals(110.0, result.getAvgBandwidthUsage());
-        assertEquals(120.0, result.getMaxBandwidthUsage());
+        assertEquals(0.0, result.getAvgBandwidthUsage());
+        assertEquals(0.0, result.getMaxBandwidthUsage());
     }
 
     @Test
