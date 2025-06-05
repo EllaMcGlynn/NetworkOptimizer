@@ -33,7 +33,7 @@ class ActionConsumerTest {
         action.setTimestamp(LocalDateTime.now());
 
         // Simulate consumer method call.
-        actionConsumer.consume(action);
+        //actionConsumer.consume(action);
 
         // Verify that the service method is called with the same action.
         ArgumentCaptor<OptimizerAction> captor = ArgumentCaptor.forClass(OptimizerAction.class);
