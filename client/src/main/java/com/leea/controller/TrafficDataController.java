@@ -104,4 +104,19 @@ public class TrafficDataController {
         ResourceUsageStats stats = trafficDataService.getBandwidthStats(nodeId);
         return ResponseEntity.ok(stats);
     }
+
+    @GetMapping("/latest-per-node/{nodeId}")
+    public ResponseEntity<TrafficData> getLatestTrafficDataForNode(@PathVariable("nodeId") Integer nodeId) {
+        Optional<TrafficData> data = trafficDataService.getMostRecentTrafficDataByNode(nodeId);
+        return data.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/usage-history/all")
+    public ResponseEntity<List<TrafficData>> getAllRecentUsageHistory() {
+        List<TrafficData> history = trafficDataService.getRecentUsageForAllNodes();
+        return ResponseEntity.ok(history);
+    }
+
+
 }
