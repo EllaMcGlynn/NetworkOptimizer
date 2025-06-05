@@ -19,7 +19,7 @@ public class ActionConsumer {
     @KafkaListener(topics = "optimizer-actions", groupId = "generator-group", containerFactory = "actionKafkaListenerContainerFactory")
 
     public void consume(String actionJson) {
-        System.out.println("Received action JSON: " + actionJson);
+        //System.out.println("Received action JSON: " + actionJson);
         try {
             OptimizerAction action = objectMapper.readValue(actionJson, OptimizerAction.class);
             dataGeneratorService.applyOptimizerAction(action);
