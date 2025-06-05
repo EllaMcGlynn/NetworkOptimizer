@@ -6,6 +6,7 @@ import com.leea.optimizer.entity.OptimizerActionEntity;
 import com.leea.optimizer.entity.OptimizationRecommendationEntity;
 import com.leea.optimizer.repository.ActionRepository;
 import com.leea.optimizer.repository.RecommendationRepository;
+import com.leea.logger.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -137,15 +138,19 @@ public class OptimizationService {
     }
 
     private void saveRecommendationToDB(OptimizationRecommendation rec) {
-        OptimizationRecommendationEntity entity = new OptimizationRecommendationEntity();
-        entity.setNodeId(rec.getNodeId());
-        entity.setNetworkId(rec.getNetworkId());
-        entity.setResourceType(rec.getResourceType());
-        entity.setCurrentUsage(rec.getCurrentUsage());
-        entity.setCurrentAllocation(rec.getCurrentAllocation());
-        entity.setRecommendedAllocation(rec.getRecommendedAllocation());
-        entity.setTimestamp(rec.getTimestamp());
-        recommendationRepository.save(entity);
+    	try {
+	        OptimizationRecommendationEntity entity = new OptimizationRecommendationEntity();
+	        entity.setNodeId(rec.getNodeId());
+	        entity.setNetworkId(rec.getNetworkId());
+	        entity.setResourceType(rec.getResourceType());
+	        entity.setCurrentUsage(rec.getCurrentUsage());
+	        entity.setCurrentAllocation(rec.getCurrentAllocation());
+	        entity.setRecommendedAllocation(rec.getRecommendedAllocation());
+	        entity.setTimestamp(rec.getTimestamp());
+	        recommendationRepository.save(entity);
+    	}catch(Exception e) {
+    		OptimizerLogger.logError(e.getStackTrace().toString());
+    	}
     }
 
     private void saveActionToDB(OptimizerAction action) {
