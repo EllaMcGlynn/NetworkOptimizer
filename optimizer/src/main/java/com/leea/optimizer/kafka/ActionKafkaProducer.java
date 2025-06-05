@@ -18,11 +18,11 @@ public class ActionKafkaProducer {
 
     public void sendAction(OptimizerAction action) {
         try {
-            System.out.println("Sending action " + action.toString());
-            String json = objectMapper.writeValueAsString(action);
-            System.out.println("Sending action: " + json);
-            kafkaTemplate.send("optimizer-actions", json);
-            System.out.println("Suggestion Sent");
+            if (action.getAmount() > 0.0001) {  // Only send if amount is non-zero
+                String json = objectMapper.writeValueAsString(action);
+                kafkaTemplate.send("optimizer-actions", json);
+                System.out.println("Sending optimization action: " + json);
+            }
         } catch (Exception e) {
             System.err.println("Failed to serialize action: " + e.getMessage());
         }

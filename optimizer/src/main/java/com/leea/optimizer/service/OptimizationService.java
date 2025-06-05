@@ -85,11 +85,26 @@ public class OptimizationService {
         List<OptimizationRecommendation> recs = new ArrayList<>();
         Map<String, Double> usage = data.getResourceUsage();
         Map<String, Double> allocated = data.getResourceAllocated();
-        recs.add(makeRecommendation(data, "CPU", usage.get("cpu"), allocated.get("cpu")));
-        recs.add(makeRecommendation(data, "Memory", usage.get("memory"), allocated.get("memory")));
-        recs.add(makeRecommendation(data, "Bandwith", usage.get("bandwith"), allocated.get("bandwith")));
+        
+        // Only add recommendations if both usage and allocation exist and are non-null
+        if (usage != null && allocated != null) {
+            addRecommendationIfNeeded(recs, data, "CPU", usage.get("CPU"), allocated.get("CPU"));
+            addRecommendationIfNeeded(recs, data, "Memory", usage.get("Memory"), allocated.get("Memory"));
+            addRecommendationIfNeeded(recs, data, "Bandwith", usage.get("Bandwith"), allocated.get("Bandwith"));
+        }
         return recs;
     }
+
+    private void addRecommendationIfNeeded(List<OptimizationRecommendation> recs, TrafficData data, 
+                                     String type, Double usage, Double allocated) {
+    if (usage != null && allocated != null && allocated > 0) {
+        OptimizationRecommendation rec = makeRecommendation(data, type, usage, allocated);
+        // Only add if there's an actual change needed
+        if (Math.abs(rec.getRecommendedAllocation() - rec.getCurrentAllocation()) > 0.0001) {
+            recs.add(rec);
+        }
+    }
+}
 
     private OptimizationRecommendation makeRecommendation(TrafficData data, String type, double usage, double allocated) {
         double ratio = usage / allocated;
