@@ -51,6 +51,18 @@ public class OptimizerAction {
         this.timestamp = timestamp;
     }
 
+    @Override
+    public String toString() {
+        return "OptimizerAction{" +
+                "nodeId=" + nodeId +
+                ", resourceType='" + resourceType + '\'' +
+                ", amount=" + amount +
+                ", actionType='" + actionType + '\'' +
+                ", executedBy='" + executedBy + '\'' +
+                ", timestamp=" + timestamp +
+                '}';
+    }
+
     private Integer nodeId;
     private String resourceType;
     private double amount;
