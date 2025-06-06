@@ -92,6 +92,20 @@ class TrafficDataServiceTest {
     }
 
     @Test
+    void testGetTrafficDataById_WhenNotFound() {
+        // Given
+        Long id = 999L;
+        when(trafficDataRepo.findById(id)).thenReturn(Optional.empty());
+
+        // When
+        Optional<TrafficData> result = trafficDataService.getTrafficDataById(id);
+
+        // Then
+        assertFalse(result.isPresent());
+        verify(trafficDataRepo, times(1)).findById(id);
+    }
+
+    @Test
     void testGetTrafficDataByNode() {
         // Given
         Integer nodeId = 1;
@@ -103,6 +117,36 @@ class TrafficDataServiceTest {
         // Then
         assertEquals(2, result.size());
         verify(trafficDataRepo, times(1)).findByNodeId(nodeId);
+    }
+
+    @Test
+    void testGetTrafficDataByNetwork() {
+        // Given
+        Integer networkId = 1;
+        when(trafficDataRepo.findByNetworkId(networkId)).thenReturn(Arrays.asList(trafficData1, trafficData2));
+
+        // When
+        List<TrafficData> result = trafficDataService.getTrafficDataByNetwork(networkId);
+
+        // Then
+        assertEquals(2, result.size());
+        verify(trafficDataRepo, times(1)).findByNetworkId(networkId);
+    }
+
+    @Test
+    void testGetTrafficDataByNodeAndNetwork() {
+        // Given
+        Integer nodeId = 1;
+        Integer networkId = 1;
+        when(trafficDataRepo.findByNodeIdAndNetworkId(nodeId, networkId))
+                .thenReturn(Arrays.asList(trafficData1, trafficData2));
+
+        // When
+        List<TrafficData> result = trafficDataService.getTrafficDataByNodeAndNetwork(nodeId, networkId);
+
+        // Then
+        assertEquals(2, result.size());
+        verify(trafficDataRepo, times(1)).findByNodeIdAndNetworkId(nodeId, networkId);
     }
 
     @Test
@@ -121,6 +165,23 @@ class TrafficDataServiceTest {
     }
 
     @Test
+    void testGetRecentTrafficDataByNode() {
+        // Given
+        Integer nodeId = 1;
+        int hours = 24;
+        LocalDateTime since = LocalDateTime.now().minusHours(hours);
+        when(trafficDataRepo.findRecentByNodeId(eq(nodeId), any(LocalDateTime.class)))
+                .thenReturn(Arrays.asList(trafficData1, trafficData2));
+
+        // When
+        List<TrafficData> result = trafficDataService.getRecentTrafficDataByNode(nodeId, hours);
+
+        // Then
+        assertEquals(2, result.size());
+        verify(trafficDataRepo, times(1)).findRecentByNodeId(eq(nodeId), any(LocalDateTime.class));
+    }
+
+    @Test
     void testGetResourceUsageStats() {
         // Given
         Integer nodeId = 1;
@@ -136,6 +197,45 @@ class TrafficDataServiceTest {
         assertEquals(0.0, result.getAvgBandwidthUsage());
         assertEquals(40.0, result.getMaxCpuUsage());
         assertEquals(70.0, result.getMaxMemoryUsage());
+        assertEquals(0.0, result.getMaxBandwidthUsage());
+    }
+
+    @Test
+    void testCalculateStats_WithEmptyList() {
+        // Given
+        Integer nodeId = 1;
+        when(trafficDataRepo.findByNodeId(nodeId)).thenReturn(List.of());
+
+        // When
+        ResourceUsageStats result = trafficDataService.getResourceUsageStats(nodeId);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(0.0, result.getAvgCpuUsage());
+        assertEquals(0.0, result.getAvgMemoryUsage());
+        assertEquals(0.0, result.getAvgBandwidthUsage());
+        assertEquals(0.0, result.getMaxCpuUsage());
+        assertEquals(0.0, result.getMaxMemoryUsage());
+        assertEquals(0.0, result.getMaxBandwidthUsage());
+    }
+
+    @Test
+    void testCalculateStats_WithNullResourceValues() {
+        // Given
+        Integer nodeId = 1;
+        TrafficData dataWithNulls = new TrafficData(1, 1, new HashMap<>(), new HashMap<>(), LocalDateTime.now());
+        when(trafficDataRepo.findByNodeId(nodeId)).thenReturn(List.of(dataWithNulls));
+
+        // When
+        ResourceUsageStats result = trafficDataService.getResourceUsageStats(nodeId);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(0.0, result.getAvgCpuUsage());
+        assertEquals(0.0, result.getAvgMemoryUsage());
+        assertEquals(0.0, result.getAvgBandwidthUsage());
+        assertEquals(0.0, result.getMaxCpuUsage());
+        assertEquals(0.0, result.getMaxMemoryUsage());
         assertEquals(0.0, result.getMaxBandwidthUsage());
     }
 
@@ -159,6 +259,21 @@ class TrafficDataServiceTest {
     }
 
     @Test
+    void testGetCpuStats_WithEmptyList() {
+        // Given
+        Integer nodeId = 1;
+        when(trafficDataRepo.findByNodeId(nodeId)).thenReturn(List.of());
+
+        // When
+        ResourceUsageStats result = trafficDataService.getCpuStats(nodeId);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(0.0, result.getAvgCpuUsage());
+        assertEquals(0.0, result.getMaxCpuUsage());
+    }
+
+    @Test
     void testGetMemoryStats() {
         // Given
         Integer nodeId = 1;
@@ -178,6 +293,21 @@ class TrafficDataServiceTest {
     }
 
     @Test
+    void testGetMemoryStats_WithEmptyList() {
+        // Given
+        Integer nodeId = 1;
+        when(trafficDataRepo.findByNodeId(nodeId)).thenReturn(List.of());
+
+        // When
+        ResourceUsageStats result = trafficDataService.getMemoryStats(nodeId);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(0.0, result.getAvgMemoryUsage());
+        assertEquals(0.0, result.getMaxMemoryUsage());
+    }
+
+    @Test
     void testGetBandwidthStats() {
         // Given
         Integer nodeId = 1;
@@ -193,6 +323,89 @@ class TrafficDataServiceTest {
         assertEquals(0.0, result.getAvgMemoryUsage());
         assertEquals(0.0, result.getMaxMemoryUsage());
         assertEquals(0.0, result.getAvgBandwidthUsage());
+        assertEquals(0.0, result.getMaxBandwidthUsage());
+    }
+
+    @Test
+    void testGetBandwidthStats_WithEmptyList() {
+        // Given
+        Integer nodeId = 1;
+        when(trafficDataRepo.findByNodeId(nodeId)).thenReturn(List.of());
+
+        // When
+        ResourceUsageStats result = trafficDataService.getBandwidthStats(nodeId);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(0.0, result.getAvgBandwidthUsage());
+        assertEquals(0.0, result.getMaxBandwidthUsage());
+    }
+
+    @Test
+    void testGetBandwidthStats_WithValidBandwidth() {
+        // Given
+        Integer nodeId = 1;
+        TrafficData data1 = new TrafficData();
+        Map<String, Double> resourceUsage = new HashMap<>();
+        resourceUsage.put("bandwith", 100.0); // Note: matches the typo in getBandwidthUsage()
+        data1.setResourceUsage(resourceUsage);
+        
+        TrafficData data2 = new TrafficData();
+        Map<String, Double> resourceUsage2 = new HashMap<>();
+        resourceUsage2.put("bandwith", 200.0);
+        data2.setResourceUsage(resourceUsage2);
+
+        when(trafficDataRepo.findByNodeId(nodeId)).thenReturn(Arrays.asList(data1, data2));
+
+        // When
+        ResourceUsageStats result = trafficDataService.getBandwidthStats(nodeId);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(150.0, result.getAvgBandwidthUsage());
+        assertEquals(200.0, result.getMaxBandwidthUsage());
+    }
+
+    @Test
+    void testGetBandwidthStats_WithMixedNullAndValidValues() {
+        // Given
+        Integer nodeId = 1;
+        TrafficData data1 = new TrafficData();
+        Map<String, Double> resourceUsage = new HashMap<>();
+        resourceUsage.put("bandwith", 100.0);
+        data1.setResourceUsage(resourceUsage);
+        
+        TrafficData data2 = new TrafficData();
+        data2.setResourceUsage(new HashMap<>()); // Empty map, will return null for bandwidth
+
+        when(trafficDataRepo.findByNodeId(nodeId)).thenReturn(Arrays.asList(data1, data2));
+
+        // When
+        ResourceUsageStats result = trafficDataService.getBandwidthStats(nodeId);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(50.0, result.getAvgBandwidthUsage());
+        assertEquals(100.0, result.getMaxBandwidthUsage());
+    }
+
+    @Test
+    void testGetResourceStatsWithNullUsageMap() {
+        // Given
+        Integer nodeId = 1;
+        TrafficData dataWithNullMap = new TrafficData(1, 1, null, new HashMap<>(), LocalDateTime.now());
+        when(trafficDataRepo.findByNodeId(nodeId)).thenReturn(List.of(dataWithNullMap));
+
+        // When
+        ResourceUsageStats result = trafficDataService.getResourceUsageStats(nodeId);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(0.0, result.getAvgCpuUsage());
+        assertEquals(0.0, result.getAvgMemoryUsage());
+        assertEquals(0.0, result.getAvgBandwidthUsage());
+        assertEquals(0.0, result.getMaxCpuUsage());
+        assertEquals(0.0, result.getMaxMemoryUsage());
         assertEquals(0.0, result.getMaxBandwidthUsage());
     }
 
