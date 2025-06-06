@@ -143,5 +143,25 @@ class KafkaConsumerServiceTest {
         }
     }
 
+    @Test
+    void testMissingTimestamp_logsError() throws JsonProcessingException {
+        String jsonMissingTimestamp = """
+        {
+          "nodeId": 1,
+          "networkId": 2,
+          "resourceUsage": { "CPU": 75.5 },
+          "resourceAllocated": { "CPU": 100.0 }
+        }
+    """;
+
+        try (MockedStatic<MessageLogger> loggerMock = mockStatic(MessageLogger.class)) {
+            kafkaConsumerService.listen(jsonMissingTimestamp);
+
+            verify(repository, never()).save(any());
+            loggerMock.verify(() -> MessageLogger.logError(contains("null value found entry")));
+        }
+    }
+
+
 }
 

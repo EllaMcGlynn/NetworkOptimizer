@@ -22,13 +22,13 @@ public class TrafficData {
     @ElementCollection
     @CollectionTable(name = "traffic_resource_usage", joinColumns = @JoinColumn(name = "traffic_data_id"))
     @MapKeyColumn(name = "resource_type")
-    @Column(name = "value")
+    @Column(name = "usage_value")
     private Map<String, Double> resourceUsage;
 
     @ElementCollection
     @CollectionTable(name = "traffic_resource_allocated", joinColumns = @JoinColumn(name = "traffic_data_id"))
     @MapKeyColumn(name = "resource_type")
-    @Column(name = "value")
+    @Column(name = "allocated_value")
     private Map<String, Double> resourceAllocated;
 
     @Column(name = "timestamp")
