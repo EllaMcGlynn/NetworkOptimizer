@@ -17,8 +17,13 @@ import java.util.Optional;
 @RequestMapping("/traffic")
 public class TrafficDataController {
 
+    private final TrafficDataService trafficDataService;
+
     @Autowired
-    private TrafficDataService trafficDataService;
+    public TrafficDataController(TrafficDataService trafficDataService) {
+        this.trafficDataService = trafficDataService;
+    }
+
 
 
     @GetMapping

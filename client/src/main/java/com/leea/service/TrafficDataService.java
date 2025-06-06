@@ -17,8 +17,12 @@ import java.util.Optional;
 @Service
 public class TrafficDataService {
 
+    private final TrafficDataRepo repository;
+
     @Autowired
-    private TrafficDataRepo repository;
+    public TrafficDataService(TrafficDataRepo repository) {
+        this.repository = repository;
+    }
 
     public List<TrafficData> getAllTrafficData() {
         return repository.findAll();
@@ -80,27 +84,27 @@ public class TrafficDataService {
 
     private ResourceUsageStats calculateStats(List<TrafficData> trafficData) {
         if (trafficData.isEmpty()) {
-            return new ResourceUsageStats(0,0,0,0,0,0);
+            return new ResourceUsageStats(0, 0, 0, 0, 0, 0);
         }
 
         double avgCpuUsage = trafficData.stream()
-                .mapToDouble(t -> t.getCpuUsage() !=null ? t.getCpuUsage() : 0)
+                .mapToDouble(t -> t.getCpuUsage() != null ? t.getCpuUsage() : 0)
                 .average().orElse(0);
         double avgMemoryUsage = trafficData.stream()
-                .mapToDouble(t -> t.getMemoryUsage() !=null ? t.getMemoryUsage() : 0)
+                .mapToDouble(t -> t.getMemoryUsage() != null ? t.getMemoryUsage() : 0)
                 .average().orElse(0);
         double avgBandwidthUsage = trafficData.stream()
-                .mapToDouble(t -> t.getBandwidthUsage() !=null ? t.getBandwidthUsage() : 0)
+                .mapToDouble(t -> t.getBandwidthUsage() != null ? t.getBandwidthUsage() : 0)
                 .average().orElse(0);
 
         double maxCpuUsage = trafficData.stream()
-                .mapToDouble(t -> t.getCpuUsage() !=null ? t.getCpuUsage() : 0)
+                .mapToDouble(t -> t.getCpuUsage() != null ? t.getCpuUsage() : 0)
                 .max().orElse(0);
         double maxMemoryUsage = trafficData.stream()
-                .mapToDouble(t -> t.getMemoryUsage() !=null ? t.getMemoryUsage() : 0)
+                .mapToDouble(t -> t.getMemoryUsage() != null ? t.getMemoryUsage() : 0)
                 .max().orElse(0);
         double maxBandwidthUsage = trafficData.stream()
-                .mapToDouble(t -> t.getBandwidthUsage() !=null ? t.getBandwidthUsage() : 0)
+                .mapToDouble(t -> t.getBandwidthUsage() != null ? t.getBandwidthUsage() : 0)
                 .max().orElse(0);
 
         return new ResourceUsageStats(avgCpuUsage, avgMemoryUsage, avgBandwidthUsage,
@@ -164,5 +168,4 @@ public class TrafficDataService {
     public List<TrafficData> getRecentUsageForAllNodes() {
         return repository.findTop30ByOrderByTimestampDesc();
     }
-
 }
