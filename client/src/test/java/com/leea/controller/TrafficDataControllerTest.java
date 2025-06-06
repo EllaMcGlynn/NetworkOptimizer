@@ -91,19 +91,34 @@ class TrafficDataControllerTest {
     }
 
     @Test
-    void testGetLatestTrafficDataForNode_found() {
-        TrafficData data = new TrafficData();
-        when(trafficDataService.getMostRecentTrafficDataByNode(2)).thenReturn(Optional.of(data));
+    void testGetTrafficDataByNetwork() {
+        int testNetworkId = 42;
+        List<TrafficData> mockData = List.of(new TrafficData());
+        when(trafficDataService.getTrafficDataByNetwork(testNetworkId)).thenReturn(mockData);
 
-        ResponseEntity<TrafficData> response = restTemplate.getForEntity(baseUrl("/latest-per-node/2"), TrafficData.class);
+        ResponseEntity<TrafficData[]> response = restTemplate.getForEntity(
+                baseUrl("/network/" + testNetworkId),
+                TrafficData[].class
+        );
+
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotEmpty();
     }
 
     @Test
-    void testGetLatestTrafficDataForNode_notFound() {
-        when(trafficDataService.getMostRecentTrafficDataByNode(99)).thenReturn(Optional.empty());
+    void testGetTrafficDataByNodeAndNetwork() {
+        int testNodeId = 7;
+        int testNetworkId = 13;
+        List<TrafficData> mockData = List.of(new TrafficData());
+        when(trafficDataService.getTrafficDataByNodeAndNetwork(testNodeId, testNetworkId)).thenReturn(mockData);
 
-        ResponseEntity<TrafficData> response = restTemplate.getForEntity(baseUrl("/latest-per-node/99"), TrafficData.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        ResponseEntity<TrafficData[]> response = restTemplate.getForEntity(
+                baseUrl("/node/" + testNodeId + "/network/" + testNetworkId),
+                TrafficData[].class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotEmpty();
     }
+
 }

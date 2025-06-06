@@ -86,42 +86,4 @@ public class TrafficDataController {
         return ResponseEntity.ok(resourceTypes);
     }
 
-    @GetMapping("/node/{nodeId}/stats")
-    public ResponseEntity<ResourceUsageStats> getResourceStats(@PathVariable("nodeId") Integer nodeId) {
-        ResourceUsageStats stats = trafficDataService.getResourceUsageStats(nodeId);
-        return ResponseEntity.ok(stats);
-    }
-
-    @GetMapping("/node/{nodeId}/stats/cpu")
-    public ResponseEntity<ResourceUsageStats> getCpuStats(@PathVariable("nodeId") Integer nodeId) {
-        ResourceUsageStats stats = trafficDataService.getCpuStats(nodeId);
-        return ResponseEntity.ok(stats);
-    }
-
-    @GetMapping("/node/{nodeId}/stats/memory")
-    public ResponseEntity<ResourceUsageStats> getMemoryStats(@PathVariable("nodeId") Integer nodeId) {
-        ResourceUsageStats stats = trafficDataService.getMemoryStats(nodeId);
-        return ResponseEntity.ok(stats);
-    }
-
-    @GetMapping("/node/{nodeId}/stats/bandwidth")
-    public ResponseEntity<ResourceUsageStats> getBandwidthStats(@PathVariable("nodeId") Integer nodeId) {
-        ResourceUsageStats stats = trafficDataService.getBandwidthStats(nodeId);
-        return ResponseEntity.ok(stats);
-    }
-
-    @GetMapping("/latest-per-node/{nodeId}")
-    public ResponseEntity<TrafficData> getLatestTrafficDataForNode(@PathVariable("nodeId") Integer nodeId) {
-        Optional<TrafficData> data = trafficDataService.getMostRecentTrafficDataByNode(nodeId);
-        return data.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @GetMapping("/usage-history/all")
-    public ResponseEntity<List<TrafficData>> getAllRecentUsageHistory() {
-        List<TrafficData> history = trafficDataService.getRecentUsageForAllNodes();
-        return ResponseEntity.ok(history);
-    }
-
-
 }
