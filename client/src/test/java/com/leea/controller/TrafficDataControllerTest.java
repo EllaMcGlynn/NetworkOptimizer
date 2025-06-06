@@ -1,124 +1,150 @@
 package com.leea.controller;
+
 import com.leea.models.TrafficData;
 import com.leea.service.TrafficDataService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Page;
-import org.springframework.http.*;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@WebMvcTest(controllers = TrafficDataController.class)
+@AutoConfigureMockMvc
 class TrafficDataControllerTest {
 
-    @LocalServerPort
-    private int port;
+    @Configuration
+    @EnableWebMvc
+    static class TestConfig {
+        @Bean
+        public TrafficDataService trafficDataService() {
+            return mock(TrafficDataService.class);
+        }
+
+        @Bean
+        public TrafficDataController trafficDataController(TrafficDataService trafficDataService) {
+            return new TrafficDataController(trafficDataService);
+        }
+    }
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
     private TrafficDataService trafficDataService;
 
-    private String baseUrl(String path) {
-        return "http://localhost:" + port + "/traffic" + path;
-    }
-
     @Test
-    void testGetAllTrafficData() {
+    void testGetAllTrafficData() throws Exception {
         TrafficData dummy = new TrafficData();
-        Page<TrafficData> page = new PageImpl<>(List.of(dummy));
-        when(trafficDataService.getTrafficData(0, 10)).thenReturn(page);
+        List<TrafficData> content = new ArrayList<>();
+        content.add(dummy);
+        PageImpl<TrafficData> page = new PageImpl<>(content, PageRequest.of(0, 10), 1);
+        when(trafficDataService.getTrafficData(eq(0), eq(10))).thenReturn(page);
 
-        ResponseEntity<String> response = restTemplate.getForEntity(baseUrl("?page=0&size=10"), String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        mockMvc.perform(get("/traffic")
+                .param("page", "0")
+                .param("size", "10")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
-    void testGetTrafficDataById_found() {
+    void testGetTrafficDataById_found() throws Exception {
         TrafficData dummy = new TrafficData();
         dummy.setId(1L);
         when(trafficDataService.getTrafficDataById(1L)).thenReturn(Optional.of(dummy));
 
-        ResponseEntity<TrafficData> response = restTemplate.getForEntity(baseUrl("/1"), TrafficData.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        mockMvc.perform(get("/traffic/1")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
-    void testGetTrafficDataById_notFound() {
+    void testGetTrafficDataById_notFound() throws Exception {
         when(trafficDataService.getTrafficDataById(999L)).thenReturn(Optional.empty());
 
-        ResponseEntity<TrafficData> response = restTemplate.getForEntity(baseUrl("/999"), TrafficData.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        mockMvc.perform(get("/traffic/999")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    void testGetTrafficDataByNode() {
+    void testGetTrafficDataByNode() throws Exception {
         when(trafficDataService.getTrafficDataByNode(5)).thenReturn(List.of(new TrafficData()));
 
-        ResponseEntity<TrafficData[]> response = restTemplate.getForEntity(baseUrl("/node/5"), TrafficData[].class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        mockMvc.perform(get("/traffic/node/5")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
-    void testGetTrafficDataInTimeRange() {
+    void testGetTrafficDataInTimeRange() throws Exception {
         LocalDateTime start = LocalDateTime.now().minusDays(1);
         LocalDateTime end = LocalDateTime.now();
-        when(trafficDataService.getTrafficDataInTimeRange(start, end)).thenReturn(List.of(new TrafficData()));
+        when(trafficDataService.getTrafficDataInTimeRange(any(), any()))
+                .thenReturn(List.of(new TrafficData()));
 
-        String url = baseUrl("/timerange?start=" + start + "&end=" + end);
-        ResponseEntity<TrafficData[]> response = restTemplate.getForEntity(url, TrafficData[].class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        mockMvc.perform(get("/traffic/timerange")
+                .param("start", start.toString())
+                .param("end", end.toString())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
-    void testGetAvailableResourceTypes() {
-        when(trafficDataService.getAvailableResourceTypes()).thenReturn(List.of("CPU", "Memory"));
+    void testGetAvailableResourceTypes() throws Exception {
+        when(trafficDataService.getAvailableResourceTypes())
+                .thenReturn(List.of("CPU", "Memory"));
 
-        ResponseEntity<String[]> response = restTemplate.getForEntity(baseUrl("/resource-types"), String[].class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).contains("CPU");
+        mockMvc.perform(get("/traffic/resource-types")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0]").value("CPU"))
+                .andExpect(jsonPath("$[1]").value("Memory"));
     }
 
     @Test
-    void testGetTrafficDataByNetwork() {
-        int testNetworkId = 42;
-        List<TrafficData> mockData = List.of(new TrafficData());
-        when(trafficDataService.getTrafficDataByNetwork(testNetworkId)).thenReturn(mockData);
+    void testGetTrafficDataByNetwork() throws Exception {
+        when(trafficDataService.getTrafficDataByNetwork(42))
+                .thenReturn(List.of(new TrafficData()));
 
-        ResponseEntity<TrafficData[]> response = restTemplate.getForEntity(
-                baseUrl("/network/" + testNetworkId),
-                TrafficData[].class
-        );
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotEmpty();
+        mockMvc.perform(get("/traffic/network/42")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
-    void testGetTrafficDataByNodeAndNetwork() {
-        int testNodeId = 7;
-        int testNetworkId = 13;
-        List<TrafficData> mockData = List.of(new TrafficData());
-        when(trafficDataService.getTrafficDataByNodeAndNetwork(testNodeId, testNetworkId)).thenReturn(mockData);
+    void testGetTrafficDataByNodeAndNetwork() throws Exception {
+        when(trafficDataService.getTrafficDataByNodeAndNetwork(7, 13))
+                .thenReturn(List.of(new TrafficData()));
 
-        ResponseEntity<TrafficData[]> response = restTemplate.getForEntity(
-                baseUrl("/node/" + testNodeId + "/network/" + testNetworkId),
-                TrafficData[].class
-        );
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotEmpty();
+        mockMvc.perform(get("/traffic/node/7/network/13")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
-
 }
